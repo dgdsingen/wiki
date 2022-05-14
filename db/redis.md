@@ -1,0 +1,17 @@
+# References
+- [Redis 소개](http://bcho.tistory.com/654) 
+- [Redis 운영에 필요한 잡지식들](http://linux.systemv.pe.kr/redis-%EC%9A%B4%EC%98%81%EC%97%90-%ED%95%84%EC%9A%94%ED%95%9C-%EC%9E%A1%EC%A7%80%EC%8B%9D%EB%93%A4/) 
+- [티몬의 개발이야기 : Redis single thread](https://tmondev.blog.me/220549729962) 
+- [카카오 레디스, 잘못쓰면 망한다 - 지디넷코리아](http://www.zdnet.co.kr/news/news_view.asp?artice_id=20131119174125) 
+- [Redis에 심플한 key-value 로 수 억개의 데이터 저장하기](https://charsyam.wordpress.com/2011/11/06/redis%EC%97%90-%EC%8B%AC%ED%94%8C%ED%95%9C-key-value-%EB%A1%9C-%EC%88%98-%EC%96%B5%EA%B0%9C%EC%9D%98-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%80%EC%9E%A5%ED%95%98%EA%B8%B0/) 
+- [AWS ElastiCache의 소개와 간단한 사용(Redis) | 야생강아지 WILDPUP](http://wildpup.cafe24.com/archives/1053) 
+- [게임서비스를 위한 ElastiCache 활용 전략 :: 구승모 솔루션즈 아키텍트 :: Gaming on AWS 2016](https://www.slideshare.net/awskorea/amazon-elasti-cache-seungmo-koo) 
+- [PYRASIS.COM: 아마존 웹 서비스를 다루는 기술 15장 - 7. ElastiCache Redis 클러스터 Security Group 생성 및 설정하기](http://pyrasis.com/book/TheArtOfAmazonWebServices/Chapter15/07) 
+- [AWS 프리 티어](https://aws.amazon.com/ko/free/) 
+- [AWS - Redis](https://aws.amazon.com/ko/redis/) 
+- [Amazon ElastiCache – 인 메모리 데이터 스토어 및 캐시](https://aws.amazon.com/ko/elasticache/) 
+- [Redis용 Amazon ElastiCache](https://aws.amazon.com/ko/elasticache/redis/) 
+- [Redis용 Amazon ElastiCache FAQ – AWS](https://aws.amazon.com/ko/elasticache/redis/faqs/) 
+- [AWS 외부에서 ElastiCache 리소스 액세스 - Amazon ElastiCache](https://docs.aws.amazon.com/ko_kr/AmazonElastiCache/latest/UserGuide/Access.Outside.html) 
+- [Redis vs Memcached](http://americanopeople.tistory.com/148) 
+

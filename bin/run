@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+function toc {
+    > README.md
+
+    find . -type f -name '*.md' ! -path '*/think*' ! -path '*/.direnv/*' ! -path '*README.md' -exec dirname {} \; | sort -u > dir.txt
+    while read dir; do
+        head_count=$(echo "${dir}" | awk -F/ '{for(i=2; i<=NF; i++){print $i}}' | wc -w)
+        head=$(echo "${dir}" | awk -F/ '{print $NF}')
+        # dir이 . 즉 ROOT_DIR을 가리키는 경우 . 대신 REPO로 대체한다.
+        if [[ "${dir}" == "." ]]; then
+            head="# ${REPO}"
+        fi
+        head=" ${head}"
+        for ((i=0; i<$head_count; i++)); do
+            head="#${head}"
+        done
+        echo "${head}" >> README.md
+
+        find "${dir}" -maxdepth 1 -type f -name '*.md' ! -path '*README.md' | sort > md.txt
+        while read file; do
+            title=$(echo "${file}" | awk -F/ '{print $NF}' | awk -F.md '{print $1}')
+            echo "- [${title}](${file})" >> README.md
+        done < md.txt
+    done < dir.txt
+
+    rm dir.txt md.txt
+}
+
+# Validate parameter
+CMD="${1}"
+shift 1
+
+cd $ROOT_DIR
+
+# Action
+case "${CMD}" in
+    toc) toc "$@";;
+    *) echo "${CMD} command not found."; exit;;
+esac
+

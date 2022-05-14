@@ -1,0 +1,13 @@
+# References
+- [JavaScript Minifier](https://javascript-minifier.com/) 
+- [CSS Minifier](https://cssminifier.com/) 
+- [Unicode Converter 1](https://www.branah.com/unicode-converter) 
+- [Unicode Converter 2](http://r12a.github.io/apps/conversion/) 
+- [SHA512 Hash Converter](http://www.convertstring.com/ko/Hash/SHA512) 
+- [FontPalace](http://www.fontpalace.com/) 
+- [특수문자표](http://www.n2n.pe.kr/lev-1/code.htm) 
+- [foo must be an RFC 3339 date-time](https://validator.w3.org/feed/docs/error/InvalidRFC3339Date.html) 
+- [gson fromjson datetime - Google 검색](https://www.google.com/search?q=gson+fromjson+datetime&oq=gson+fromjson+datetime&aqs=chrome..69i57.3053j0j7&sourceid=chrome&ie=UTF-8) 
+- [Yaml](https://yaml.org/) 
+- [ISO 639 (언어코드)](https://ko.wikipedia.org/wiki/ISO_639) 
+- [ISO 3166-1 (국가코드)](https://ko.wikipedia.org/wiki/ISO_3166-1) 
