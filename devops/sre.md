@@ -23,7 +23,7 @@
 
 - SRE는 크게 아래와 같은 일들을 한다. (From Google Next 2018)
 
-![image-20200926215542268](images/devops/image-20200926215542268.png)
+![image-20200926215542268](images/sre/image-20200926215542268.png)
 
 - Metric & Monitoring
     - 서비스 지표를 정의하고 그 지표를 모니터링 시스템에 적용한다. 
@@ -57,7 +57,7 @@
 
 - SRE는 위와 같은 일을 하기 위해 아래와 같은 활동을 한다. (From Google Next 2018)
 
-![image-20200927133949013](images/devops/image-20200927133949013.png)
+![image-20200927133949013](images/sre/image-20200927133949013.png)
 
 - Reduce organizational silos
 - Accept failure as normal
