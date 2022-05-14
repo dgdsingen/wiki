@@ -53,6 +53,7 @@
 # devops
 - [ci-cd](./devops/ci-cd.md)
 - [devops](./devops/devops.md)
+- [sre](./devops/sre.md)
 # gcp
 - [gcp](./gcp/gcp.md)
 - [professional-cloud-architect](./gcp/professional-cloud-architect.md)
