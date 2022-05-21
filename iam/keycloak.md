@@ -1064,7 +1064,6 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $acce
 
 - User Federation에 등록한 LDAP으로  User 정보를 가져올 때 기본 email 컬럼에 들어가는 값은 다 소문자로 들어간다. 그런데 실제 email 주소의 ID 부분은 Case-Sensitive일 수 있다. 그럴 때는 아래와 같이 Attribute를 하나 더 파서 email 값을 가져오면 대소문자가 정확하게 들어온다.
     - Keycloak > Configure > User Federation > ldap > Mappers > Create
-
         - Name : caseSensitiveEmail
         - Mapper Type : user-attribute-ldap-mapper
         - User Model Attribute : caseSensitiveEmail
