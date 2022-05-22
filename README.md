@@ -15,7 +15,6 @@
 - [jmeter](./jmeter.md)
 - [markdown](./markdown.md)
 - [media](./media.md)
-- [network](./network.md)
 - [python](./python.md)
 - [remmina](./remmina.md)
 - [security](./security.md)
@@ -69,7 +68,8 @@
 - [lubuntu-20.04](./linux/lubuntu-20.04.md)
 # mac
 - [mac](./mac/mac.md)
-# web
-- [open-api](./web/open-api.md)
-- [web-server](./web/web-server.md)
-- [web](./web/web.md)
+# network
+- [network](./network/network.md)
+- [open-api](./network/open-api.md)
+- [web-server](./network/web-server.md)
+- [web](./network/web.md)
