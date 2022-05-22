@@ -423,14 +423,24 @@ Cisco AnyConnect Client로 접속할 수 있는 Open Source VPN Server.
 
 # References
 
-- [포워드 프록시(forward proxy) 리버스 프록시(reverse proxy) 의 차이](https://www.lesstif.com/pages/viewpage.action?pageId=21430345) 
-- [Reverse Proxy Guide - Apache HTTP Server Version 2.4](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) 
-- [ASUS 라우터 퍼포먼스 최적화](http://kollhong.tistory.com/57) 
-- [ngrok으로 로컬 네트워크의 터널 열기](https://blog.outsider.ne.kr/1159) 
-- [mitmproxy를 활용해 구글 애널리틱스 테스트 자동화하기](https://engineering.linecorp.com/ko/blog/auto-inspecting-testing-with-google-analytics/) 
-- [HTTP/3 explained](https://daniel.haxx.se/http3-explained/) 
-- [gRPC](https://grpc.io/) 
-- [도메인 위임에 의한 GSLB 서버 및 이를 이용한 CDN 서비스 시스템 및 방법](https://patents.google.com/patent/KR101039370B1/ko) 
-- [NAT loopback 개요](https://vigroup6.tistory.com/109) 
-- [NAT loopback 문제 분석](https://velog.io/@haruband/K8S-NAT-%EB%A3%A8%ED%94%84%EB%B0%B1-%EB%AC%B8%EC%A0%9C-%EB%B6%84%EC%84%9D) 
-
+> [포워드 프록시(forward proxy) 리버스 프록시(reverse proxy) 의 차이](https://www.lesstif.com/pages/viewpage.action?pageId=21430345) 
+>
+> [Reverse Proxy Guide - Apache HTTP Server Version 2.4](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) 
+>
+> [ASUS 라우터 퍼포먼스 최적화](http://kollhong.tistory.com/57) 
+>
+> [ngrok으로 로컬 네트워크의 터널 열기](https://blog.outsider.ne.kr/1159) 
+>
+> [mitmproxy를 활용해 구글 애널리틱스 테스트 자동화하기](https://engineering.linecorp.com/ko/blog/auto-inspecting-testing-with-google-analytics/) 
+>
+> [HTTP/3 explained](https://daniel.haxx.se/http3-explained/) 
+>
+> [gRPC](https://grpc.io/) 
+>
+> [도메인 위임에 의한 GSLB 서버 및 이를 이용한 CDN 서비스 시스템 및 방법](https://patents.google.com/patent/KR101039370B1/ko) 
+>
+> [NAT loopback 개요](https://vigroup6.tistory.com/109) 
+>
+> [NAT loopback 문제 분석](https://velog.io/@haruband/K8S-NAT-%EB%A3%A8%ED%94%84%EB%B0%B1-%EB%AC%B8%EC%A0%9C-%EB%B6%84%EC%84%9D) 
+>
+> [What is a DMZ?](https://www.youtube.com/watch?v=dqlzQXo1wqo) 
