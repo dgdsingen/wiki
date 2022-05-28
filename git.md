@@ -454,6 +454,17 @@ gitlab-ctl reconfigure; gitlab-ctl restart
 
 # Issues
 
+## move master > main branch
+
+```sh
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+```
+
+
+
 ## group/repo 일괄 git clone
 
 ```sh
