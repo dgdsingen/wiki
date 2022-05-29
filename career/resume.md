@@ -97,7 +97,7 @@
 | AWS: Certified Solutions Architect - Associate (SAA-C02)     | 2021-10-30 | AWS                  | [Badge](https://www.credly.com/badges/41d94c4a-c54a-4d77-b35f-04ba3295fd65/public_url) |
 | Architecting on AWS                                          | 2021-06-29 | Megazone             |                                                              |
 | AWS: Container Immersion Day                                 | 2020-11-11 | AWS                  |                                                              |
-| Microsoft Certified: Azure Fundamentals (AZ-900)             | 2020-05-19 | Microsoft            | 989938128, [Badge](https://www.credly.com/badges/5d22e416-266b-494b-98b6-679711f8fb96/linked_in_profile) |
+| Microsoft Certified: Azure Fundamentals (AZ-900)             | 2020-05-19 | Microsoft            | 989938128, [Badge](https://www.credly.com/badges/5d22e416-266b-494b-98b6-679711f8fb96) |
 | Azure 기본 사항 Course                                       | 2020-05-19 | Microsoft            |                                                              |
 | AWS: CEP(Cloud Educate Program)                              | 2020-06-30 | AWS                  |                                                              |
 | AWS: Cloud Practitioner Essentials (2nd Edition)             | 2019-06-22 | AWS                  |                                                              |
