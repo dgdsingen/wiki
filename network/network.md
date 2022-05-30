@@ -37,6 +37,8 @@
 > [CIDR to IPv4 Address Range Utility Tool | IPAddressGuide](https://www.ipaddressguide.com/cidr) 
 >
 > [CIDR 계산기](https://ko.rakko.tools/tools/27/) 
+>
+> [IPv4 CIDR Ranges for Everything except RFC1918](https://serverfault.com/questions/304781/ipv4-cidr-ranges-for-everything-except-rfc1918) : Public IP만 VPN으로 Routing 걸려는 경우 Private IP를 제외한 나머지 모든 대역을 알아야 한다. 그 때 사용.
 
 
 
