@@ -6,7 +6,6 @@
 - [cache](./cache.md)
 - [chrome](./chrome.md)
 - [deep-learning](./deep-learning.md)
-- [elastic-search](./elastic-search.md)
 - [format](./format.md)
 - [git](./git.md)
 - [hyperledger-fabric](./hyperledger-fabric.md)
@@ -44,6 +43,7 @@
 - [k8s](./container/k8s.md)
 # db
 - [db](./db/db.md)
+- [elastic-search](./db/elastic-search.md)
 - [hazelcast](./db/hazelcast.md)
 - [mysql](./db/mysql.md)
 - [oracle](./db/oracle.md)
