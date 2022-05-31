@@ -477,7 +477,7 @@ Mac에서는 `brew install k9s` , Linux에서는 https://github.com/derailed/k9s
 ```sh
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install prometheus prometheus-community/kube-state-metrics
+helm install prometheus prometheus-community/prometheus
 ```
 
 이후 아래와 같은 svc가 생성된다. 이 중 prometheus-server를 LB, DNS에 등록하여 접속 잘 되면 OK.
@@ -491,15 +491,17 @@ prometheus-pushgateway          ClusterIP   100.64.36.56    <none>        9091/T
 prometheus-server               ClusterIP   100.64.36.205   <none>        80/TCP     51m
 ```
 
+
+
 Grafana를 실행한다. 초기 계정은 admin / admin 이다.
 
 ```sh
 docker run -d -p 3000:3000 --name grafana grafana/grafana-oss
 ```
 
-grafana에 접속해 Datasource로 Prometheus를 등록한다. Domain or IP는 위에서 등록한 값을 그대로 넣어준다.
+grafana에 접속해 Datasource로 Prometheus를 등록한다. Domain/IP는 위에서 등록한 값을 그대로 넣어준다.
 
-이제 Dashboard > Import 메뉴로 가서 "grafana kubernetes dashboard" 구글링해서 마음에 드는 Dashboard를 Import 해준다.
+"grafana kubernetes dashboard" 구글링해서 마음에 드는 것을 골라 Dashboard > Import 로 구성해준다.
 
 
 
