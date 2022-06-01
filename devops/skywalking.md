@@ -31,7 +31,7 @@
 
 
 ```yaml
-# /home/hip-dev/moni-devstg/install-skywalking/skywalking-kubernetes/chart/skywalking/files/conf.d/oap
+# /home/test/install-skywalking/skywalking-kubernetes/chart/skywalking/files/conf.d/oap
 
 rules:
   service_percent_rule:
