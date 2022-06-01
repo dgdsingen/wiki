@@ -30,24 +30,6 @@
 
 
 
-```yaml
-# /home/test/install-skywalking/skywalking-kubernetes/chart/skywalking/files/conf.d/oap
-
-rules:
-  service_percent_rule:
-    metrics-name: service_percent
-    threshold: 1
-    op: <
-    period: 10
-    count: 4
-    only-as-condition: false
-
-helm dep up skywalking
-helm upgrade skywalking skywalking
-```
-
-
-
 # Deploy Skywalking Server on k8s
 
 Cluster와 Worker Node를 준비한다.
@@ -488,4 +470,23 @@ kubectl apply -f otel-collector-config.yaml
 --set oap.envoy.als.enabled=true \ # for k8s prometheus metrics
 ```
 
+
+
+# OAP custom config
+
+```yaml
+# /home/test/install-skywalking/skywalking-kubernetes/chart/skywalking/files/conf.d/oap
+
+rules:
+  service_percent_rule:
+    metrics-name: service_percent
+    threshold: 1
+    op: <
+    period: 10
+    count: 4
+    only-as-condition: false
+
+helm dep up skywalking
+helm upgrade skywalking skywalking
+```
 
