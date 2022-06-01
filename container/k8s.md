@@ -505,6 +505,74 @@ grafana에 접속해 Datasource로 Prometheus를 등록한다. Domain/IP는 위�
 
 
 
+### grafana(2) + mysql 로 HA 구성
+
+```sh
+helm repo add grafana https://grafana.github.io/helm-charts
+git clone https://github.com/grafana/helm-charts.git
+```
+
+`helm-charts/charts/grafana/values.yaml` 을 아래와 같이 변경한다. Service type을 LoadBalancer로 사용하는 경우 minikube에서는 metallb 설정을 먼저 해준다.
+
+```diff
+-replicas: 1
++replicas: 2
+ 
+ ## Create a headless service for the deployment
+ headlessService: false
+@@ -151,7 +151,7 @@ podPortName: grafana
+ ##
+ service:
+   enabled: true
+-  type: ClusterIP
++  type: LoadBalancer
+   port: 80
+   targetPort: 3000
+     # targetPort: 4181 To be used with a proxy extraContainer
+@@ -335,7 +335,7 @@ initChownData:
+ 
+ # Administrator credentials when not using an existing secret (see below)
+ adminUser: admin
+-# adminPassword: strongpassword
++adminPassword: admin
+ 
+ # Use an existing secret for the admin user.
+ admin:
+@@ -587,6 +587,12 @@ grafana.ini:
+     mode: console
+   grafana_net:
+     url: https://grafana.net
++  database:
++    type: mysql
++    host: mysql.default.svc.cluster.local
++    name: grafana
++    user: root
++    password: 1212
+```
+
+```sh
+# mysql을 먼저 설치한다.
+cd $ROOT_DIR
+kubectl apply -f mysql.yml
+
+# chart 내용을 변경한 경우 반드시 update를 한번 해주자
+cd helm-charts/charts
+helm dep up grafana
+
+# grafana를 설치한다.
+helm install grafana grafana
+
+# 내용 변경시 update
+helm upgrade grafana grafana
+
+# 삭제
+helm uninstall grafana
+```
+
+이제 어느 grafana pod에 접속하더라도 mysql에 의해 데이터가 공유된다.
+
+
+
 # Issues
 
 **완료된 CronJob Pod 삭제하기** 
