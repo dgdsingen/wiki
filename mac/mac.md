@@ -3,7 +3,7 @@
 ## brew
 
 ```sh
-brew install bash-completion bat bind direnv dnsmasq docker docker-compose minikube fd ffmpeg fzf git helm htop hyperkit ipcalc jq k9s kubernetes-cli maven minikube nginx node openjdk p7zip pandoc peco pyenv pyenv-virtualenv python-tk@3.9 python@3.9 rclone tcl-tk telnet tree watch wget iproute2mac
+brew install bash-completion bat bind direnv dnsmasq docker docker-compose fd ffmpeg fzf git helm htop hyperkit ipcalc jq k9s kubernetes-cli maven minikube nginx node openjdk p7zip pandoc peco pyenv pyenv-virtualenv python-tk@3.9 python@3.9 rclone tcl-tk telnet tree watch wget iproute2mac
 # docker-machine squid terraform tmux webex
 
 brew install --cask adobe-digital-editions alfred adoptopenjdk blackhole-2ch calibre dbeaver-community firefox google-chrome hammerspoon karabiner-elements libreoffice macvim smplayer spectacle typora visual-studio-code wireshark multipass
