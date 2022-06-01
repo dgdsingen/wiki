@@ -466,6 +466,16 @@ Mac에서는 `brew install k9s` , Linux에서는 https://github.com/derailed/k9s
 
 
 
+## node-shell
+
+Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 Node에 띄워서 접속하면 되는데, 이를 자동화해주는 도구다.
+
+> https://github.com/kvaps/kubectl-node-shell
+
+
+
+
+
 ## K8s + Prometheus + Grafana
 
 우선 k8s에 prometheus부터 배포한다.
