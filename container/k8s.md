@@ -8,8 +8,6 @@
 >
 > [kubectl commands](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands) 
 >
-> [minikube Docs](https://minikube.sigs.k8s.io/docs/) 
->
 > [K8s instance calculator](https://learnk8s.io/kubernetes-instance-calculator) 
 >
 > [metrics-server](https://github.com/kubernetes-sigs/metrics-server) 
@@ -26,7 +24,7 @@
 
 ## Minikube
 
-> [Minikube Docs](https://minikube.sigs.k8s.io/docs/) 
+> https://minikube.sigs.k8s.io/docs/
 
 
 
