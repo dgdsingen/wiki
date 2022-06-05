@@ -588,6 +588,33 @@ helm uninstall grafana
 
 
 
+### Add mysql-exporter
+
+```sh
+git clone https://github.com/prometheus-community/helm-charts.git
+```
+
+`helm-charts/charts/prometheus-mysql-exporter/values.yaml` 을 아래와 같이 변경한다.
+
+```diff
+ mysql:
+-  db: ""
+-  host: "localhost"
++  db: "mysql"
++  host: "mysql"
+   param: ""
+-  pass: "password"
++  pass: "1212"
+   port: 3306
+   protocol: ""
+-  user: "exporter"
++  user: "root"
+```
+
+이후 grafana에서 datasource는 그대로 prometheus로 두고, mysql dashboard만 추가해보면 mysql server metric이 잘 보이는 것을 확인할 수 있다.
+
+
+
 # Issues
 
 **완료된 CronJob Pod 삭제하기** 
