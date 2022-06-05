@@ -313,6 +313,19 @@ sudo pip install nfd2nfc
 nfd2nfc 경로명
 ```
 
+## Timezone
+
+```sh
+# TZ 환경변수를 설정하는 방법. 이 경우 date 명령어는 timezone이 바뀌지 않는다.
+export TZ=Asia/Seoul
+
+# localtime 파일 복사 방법. 이 경우 date 명령어도 timezone이 바뀐다.
+cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+# timedatectl 명령어 사용 방법. 이건 사실 명령어 내부적으로 localtime 파일 복사 방법을 사용한다.
+timedatectl set-timezone Asia/Seoul
+```
+
 
 
 # Ubuntu
