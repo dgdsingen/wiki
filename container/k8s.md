@@ -105,7 +105,7 @@ minikube dashboard
 
 
 
-### Example with nginx
+### Example for nginx
 
 ```yaml
 cat <<EOF | kubectl apply -f -
@@ -199,7 +199,7 @@ netstat -nrf inet
 
 
 
-### Enable Ingress
+### Enable ingress
 
 ```sh
 minikube addons enable ingress
@@ -207,6 +207,15 @@ minikube addons enable ingress
 # ingress-nginx pod 확인
 kubectl get po -A
 curl -I http://`minikube ip`/healthz
+```
+
+
+
+### Enable metrics-server
+
+```sh
+mk addons enable metrics-server
+# 이후 kubectl top 사용 가능해짐
 ```
 
 
@@ -469,8 +478,6 @@ Mac에서는 `brew install k9s` , Linux에서는 https://github.com/derailed/k9s
 Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 Node에 띄워서 접속하면 되는데, 이를 자동화해주는 도구다.
 
 > https://github.com/kvaps/kubectl-node-shell
-
-
 
 
 
