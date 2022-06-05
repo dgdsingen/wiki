@@ -327,6 +327,10 @@ cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 timedatectl set-timezone Asia/Seoul
 ```
 
+만약 Host에서 datetime을 변경한다면 그 위에 띄운 Container OS의 시간도 같이 바뀐다.
+
+그러나 timezone 설정은 Container OS의 것을 그대로 따라간다.
+
 
 
 # Ubuntu
