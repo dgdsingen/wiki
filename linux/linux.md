@@ -1,30 +1,100 @@
 # References
 
-- [LXR](http://lxr.linux.no/) 
-- [TLDP](http://www.tldp.org/) 
-- [Debian](https://www.debian.org/CD/live/) 
-- [System freezes completely with Intel Bay Trail](https://askubuntu.com/questions/803640/system-freezes-completely-with-intel-bay-trail#) 
-- [리눅스 swap 공간의 역할 | Young H. Oh](http://micol.tistory.com/269) 
-- [AIX Memory](http://jangpd007.tistory.com/253) 
-- [IBM Poor system and search performance and high swapping activity on the OmniFind Enterprise Edition search server - Korea](http://www-01.ibm.com/support/docview.wss?uid=swg21201836) 
-- [Ubuntu Locale 한글로 바꾸기](https://beomi.github.io/2017/07/10/Ubuntu-Locale-to-ko_KR/) 
-- [When does swap start to be used? When does a process get an out of memory error and be killed? - Unix &amp; Linux Stack Exchange](https://unix.stackexchange.com/questions/176372/when-does-swap-start-to-be-used-when-does-a-process-get-an-out-of-memory-error) 
-- [boot - How can I set bluetooth off as default? - Ask Ubuntu](https://askubuntu.com/questions/1047018/how-can-i-set-bluetooth-off-as-default) 
-- [ecryptfs 사용하기](https://andmemories.blogspot.com/2014/07/ecryptfs.html) 
-- [ecryptfs로 home 암호화](http://kasw.blogspot.com/2016/03/blog-post.html) 
-- [우분투 암호화 폴더 ecryptfs](http://cluster1.cafe.daum.net/_c21_/bbs_search_read?grpid=1HRzv&fldid=Hhp4&datanum=10&contentval=&docid=1HRzvHhp41020111221214036) 
-- [데비안 리눅스 디스크/파티션 LUKS로 암호화하기 - 나긋한 개발](http://sacstory.tistory.com/entry/%ED%95%98%EB%93%9C-%EC%B6%94%EA%B0%80%EC%8B%9C) 
-- [How to setup FTP server on Ubuntu 18.04 Bionic Beaver with VSFTPD - LinuxConfig.org](https://linuxconfig.org/how-to-setup-ftp-server-on-ubuntu-18-04-bionic-beaver-with-vsftpd) 
-- [File encoding 변환](http://bitsoul.tistory.com/150) 
-- [The Ultimate Wget Download Guide With 15 Awesome Examples](https://www.thegeekstuff.com/2009/09/the-ultimate-wget-download-guide-with-15-awesome-examples/) 
-- [Linux sshfs로 다른 시스템 마운트(mount)하기](https://blog.leocat.kr/notes/2018/04/23/sshfs-mount-remote-server-using-ssh) 
-- [Pen Drive Linux](https://www.pendrivelinux.com/) 
-- [Ubuntu 20.04 LTS 노트북엔 필수! 전원 관리 tlp와 Powertop, Slimbook (Update)](https://pstudio411.tistory.com/entry/Ubuntu-2004-%EB%85%B8%ED%8A%B8%EB%B6%81%EC%97%94-%ED%95%84%EC%88%98-%EC%A0%84%EC%9B%90-%EA%B4%80%EB%A6%AC) 
-- [리눅스 네임스페이스(Linux Namespace)란?](https://www.44bits.io/ko/keyword/linux-namespace)
+> [LXR](http://lxr.linux.no/) 
+>
+> [TLDP](http://www.tldp.org/) 
+>
+> [Debian](https://www.debian.org/CD/live/) 
+>
+> [System freezes completely with Intel Bay Trail](https://askubuntu.com/questions/803640/system-freezes-completely-with-intel-bay-trail#) 
+>
+> [리눅스 swap 공간의 역할 | Young H. Oh](http://micol.tistory.com/269) 
+>
+> [AIX Memory](http://jangpd007.tistory.com/253) 
+>
+> [IBM Poor system and search performance and high swapping activity on the OmniFind Enterprise Edition search server - Korea](http://www-01.ibm.com/support/docview.wss?uid=swg21201836) 
+>
+> [Ubuntu Locale 한글로 바꾸기](https://beomi.github.io/2017/07/10/Ubuntu-Locale-to-ko_KR/) 
+>
+> [When does swap start to be used? When does a process get an out of memory error and be killed? - Unix &amp; Linux Stack Exchange](https://unix.stackexchange.com/questions/176372/when-does-swap-start-to-be-used-when-does-a-process-get-an-out-of-memory-error) 
+>
+> [boot - How can I set bluetooth off as default? - Ask Ubuntu](https://askubuntu.com/questions/1047018/how-can-i-set-bluetooth-off-as-default) 
+>
+> [ecryptfs 사용하기](https://andmemories.blogspot.com/2014/07/ecryptfs.html) 
+>
+> [ecryptfs로 home 암호화](http://kasw.blogspot.com/2016/03/blog-post.html) 
+>
+> [우분투 암호화 폴더 ecryptfs](http://cluster1.cafe.daum.net/_c21_/bbs_search_read?grpid=1HRzv&fldid=Hhp4&datanum=10&contentval=&docid=1HRzvHhp41020111221214036) 
+>
+> [데비안 리눅스 디스크/파티션 LUKS로 암호화하기 - 나긋한 개발](http://sacstory.tistory.com/entry/%ED%95%98%EB%93%9C-%EC%B6%94%EA%B0%80%EC%8B%9C) 
+>
+> [How to setup FTP server on Ubuntu 18.04 Bionic Beaver with VSFTPD - LinuxConfig.org](https://linuxconfig.org/how-to-setup-ftp-server-on-ubuntu-18-04-bionic-beaver-with-vsftpd) 
+>
+> [File encoding 변환](http://bitsoul.tistory.com/150) 
+>
+> [The Ultimate Wget Download Guide With 15 Awesome Examples](https://www.thegeekstuff.com/2009/09/the-ultimate-wget-download-guide-with-15-awesome-examples/) 
+>
+> [Linux sshfs로 다른 시스템 마운트(mount)하기](https://blog.leocat.kr/notes/2018/04/23/sshfs-mount-remote-server-using-ssh) 
+>
+> [Pen Drive Linux](https://www.pendrivelinux.com/) 
+>
+> [Ubuntu 20.04 LTS 노트북엔 필수! 전원 관리 tlp와 Powertop, Slimbook (Update)](https://pstudio411.tistory.com/entry/Ubuntu-2004-%EB%85%B8%ED%8A%B8%EB%B6%81%EC%97%94-%ED%95%84%EC%88%98-%EC%A0%84%EC%9B%90-%EA%B4%80%EB%A6%AC) 
+>
+> [리눅스 네임스페이스(Linux Namespace)란?](https://www.44bits.io/ko/keyword/linux-namespace)
 
 
 
-# Common
+## Mailing to remote domains not supported
+
+```sh
+sudo dpkg-reconfigure exim4-config
+```
+
+## Mac 한글파일명 자소분리 fix
+
+```sh
+sudo pip install nfd2nfc
+
+nfd2nfc 경로명
+```
+
+
+
+# Boot
+
+## grub 망가졌을때 live cd로 복구하기
+
+```sh
+# 라이브 CD로 부팅 후, 리눅스 파티션 확인
+sudo fdisk -l
+
+# 확인된 리눅스 파티션을 마운트 한 후
+sudo mount /dev/sdb6 /mnt
+
+# 필요한 것들을 추가로 마운트
+sudo mount -t proc none /mnt/proc
+sudo mount -o bind /dev /mnt/dev
+
+# chroot 명령을 이용해서 /mnt디렉토리를 루트로 바꾼 후
+sudo chroot /mnt/ /bin/bash
+
+# grub 재설치
+grub-install /dev/sda
+```
+
+## grub timeout 설정
+
+```sh
+/etc/default/grub
+
+GRUB_TIMEOUT=10 #seconds
+
+sudo update-grub
+```
+
+
+
+# Process
 
 ## chkconfig
 
@@ -45,15 +115,43 @@ description: GridCenter is Cluster Power Middleware
 위의 구문에서 chkconfig 뒤의 345 는 런레벨을 의미하고 90 20 은 booting, halt 시 start, stop 되는 순서이다.
 
 
-## Partition check
+
+## crontab
 
 ```sh
--- Tree 구조 확인 
-lsblk 
- 
--- UUID 확인 
+# crontab 확인
+sudo crontab -l
+
+# crontab 등록 (sudo이므로 root의 crontab에 등록)
+sudo crontab -e
+
+# 분 시 일 월 요일 명령
+00 12 * * * /mnt/data/bak/bak.sh
+
+# 위와 같이 처리 후 reboot 했을때 crontab 등록이 초기화될 경우에는 아래와 같이 처리
+sudo vi /etc/crontab
+
+# 분 시 일 월 요일 유저 명령
+00 12 * * * root /mnt/data/bak/bak.sh
+
+# cron service 재시작
+sudo service cron restart
+```
+
+
+
+# Filesystem
+
+## Partition Check
+
+```sh
+-- Tree 구조 확인
+lsblk
+
+-- UUID 확인
 sudo blkid
 ```
+
 
 
 ## fstab
@@ -76,37 +174,33 @@ tmpfs /tmp tmpfs defaults,noatime,mode=1777 0 0
 ```
 
 
-## 디스크 용량 확인
 
-df 명령은 현재 마운트 되어있는 파일시스템과 사용량을 보여주는 명령이다. 
-df -h 
+## 용량 확인
 
-df 명령에 사용할 수 있는 옵션으로는 다음과 같다.
+df 명령은 현재 마운트 되어있는 파일시스템과 사용량을 보여주는 명령이다. df 명령에 사용할 수 있는 옵션으로는 다음과 같다.
 
--a : 디폴트로 생략된 파일시스템의 크기가 0KB 인것도 모두 보여준다.
+- -a : 디폴트로 생략된 파일시스템의 크기가 0KB 인것도 모두 보여준다.
+- -t fstype, --type=fstype : 지정한 파일시스템 정보만 보여준다.
+- -x fstype, --exclude-type=fstype : 지정한 파일시스템을 제외한 모든 파일시스템 정보를 보여준다.
+- -i, --inode : 블럭 사용정보 대신에 inode 정보를 보여준다.
+- -k, --kilobytes : 디스크 사용량의 단위를 KB단위로 보여준다.
+- -m, --megabytes : 디스크 사용량의 단위를 MB단위로 보여준다.
+- -h : 디스크 사용량의 크기 단위를 자동으로 설정한다. 
 
--t fstype, --type=fstype : 지정한 파일시스템 정보만 보여준다.
-
--x fstype, --exclude-type=fstype : 지정한 파일시스템을 제외한 모든 파일시스템 정보를 보여준다.
-
--i, --inode : 블럭 사용정보 대신에 inode 정보를 보여준다.
-
--k, --kilobytes : 디스크 사용량의 단위를 KB단위로 보여준다.
-
--m, --megabytes : 디스크 사용량의 단위를 MB단위로 보여준다.
-
--h : 디스크 사용량의 크기단위를 자동으로 설정한다. 
-
-df명령어는 현재 사용하지 않고 남아있는 하드 디스크의 공간상태를 알려주는 명령어이다.  
-파일 시스템의 종류를 지정하지 않으면 현재 마운트 되어있는 파일 시스템에 대해 남아있는 디스크 정보를 보여주게 된다.  
-디스크 용량은 디폴트로 1KB Block으로 표시한다. 
-
-디렉토리별 용량을 보고 싶다면 du 명령어를 사용한다.
+df명령어는 현재 사용하지 않고 남아있는 하드 디스크의 공간상태를 알려주는 명령어이다. 파일 시스템의 종류를 지정하지 않으면 현재 마운트 되어있는 파일 시스템에 대해 남아있는 디스크 정보를 보여주게 된다. 디스크 용량은 디폴트로 1KB Block으로 표시한다. 디렉토리별 용량을 보고 싶다면 du 명령어를 사용한다.
 
 ```sh
 du -h
 du -hd 1 # --max-depth=1 로 디렉토리 용량을 측정
 du -hd 1 | sort -hr # 용량 큰 순으로 정렬
+```
+
+
+
+GUI로 좀 더 편하게 디렉토리 용량을 보고 싶다면 [ncdu](https://dev.yorhel.nl/ncdu)를 사용한다.
+
+```sh
+sudo apt install -y ncdu
 ```
 
 
@@ -173,8 +267,22 @@ du -hd 1 | sort -hr # 용량 큰 순으로 정렬
     - /usr/share/doc : 각종 프로그램에 관한 문서 파일들을 포함. 아래 3개와 독립적이다. (가장 상세)
         *   man * : 각종 프로그램에 관한 메뉴얼을 보여줌. (상세)
         *   help * : (간단)
-        *   * --help : (아주 간단)
+        *   --help : (아주 간단)
 
+
+
+## Symbolic Link
+
+만약 심볼릭 링크가 참조하는 소스를 나타내는 곳에 상대경로가 들어갈 경우, 참조하는 기호가 너무 복잡해서 불가능하다는 메시지를 볼 수 있다. 그러므로 참조의 원본은 반드시 절대경로로 설정해주자.
+
+```sh
+sudo ln -s ./tomcatstart /usr/bin/tomcatstart (X)
+sudo ln -s /home/cr420/tomcatstart ./tomcatstart (O)
+```
+
+
+
+# Hardware
 
 ## Hardware 상태 확인
 
@@ -220,77 +328,37 @@ cat /etc/rehat-release
 ```
 
 
-## 심볼릭 링크
 
-만약 심볼릭 링크가 참조하는 소스를 나타내는 곳에 상대경로가 들어갈 경우, 참조하는 기호가 너무 복잡해서 불가능하다는 메시지를 볼 수 있다. 그러므로 참조의 원본은 반드시 절대경로로 설정해주자.
+## HDD 배드섹터 검사
 
-sudo ln -s ./tomcatstart /usr/bin/tomcatstart (X)
+```sh
+sudo badblocks -v /dev/sda
+```
 
-sudo ln -s /home/cr420/tomcatstart ./tomcatstart (O)
 
 
 ## 모니터 refresh
 
+```sh
 xrandr -o left
-
 xrandr -o normal
-
-
-## HDD 배드섹터 검사
-
-sudo badblocks -v /dev/sda
-
-## crontab
-
-```sh
-# crontab 확인
-sudo crontab -l
-
-# crontab 등록 (sudo이므로 root의 crontab에 등록)
-sudo crontab -e
-
-# 분 시 일 월 요일 명령
-00 12 * * * /mnt/data/bak/bak.sh
-
-# 위와 같이 처리 후 reboot 했을때 crontab 등록이 초기화될 경우에는 아래와 같이 처리
-sudo vi /etc/crontab
-
-# 분 시 일 월 요일 유저 명령
-00 12 * * * root /mnt/data/bak/bak.sh
-
-# cron service 재시작
-sudo service cron restart
 ```
 
-## grub 망가졌을때 live cd로 복구하기
+
+
+# Monitoring
+
+## btop
+
+cpu, memory, disk, network 사용량을 GUI로 한번에 확인하고 싶다면 [btop](https://github.com/aristocratos/btop)을 사용한다.
 
 ```sh
-# 라이브 CD로 부팅 후, 리눅스 파티션 확인
-sudo fdisk -l
-
-# 확인된 리눅스 파티션을 마운트 한 후
-sudo mount /dev/sdb6 /mnt
-
-# 필요한 것들을 추가로 마운트
-sudo mount -t proc none /mnt/proc
-sudo mount -o bind /dev /mnt/dev
-
-# chroot 명령을 이용해서 /mnt디렉토리를 루트로 바꾼 후
-sudo chroot /mnt/ /bin/bash
-
-# grub 재설치
-grub-install /dev/sda
+sudo snap install btop
 ```
 
-## grub timeout 설정
 
-```sh
-/etc/default/grub
 
-GRUB_TIMEOUT=10 #seconds
-
-sudo update-grub
-```
+# OS Config
 
 ## Mail
 
@@ -299,19 +367,7 @@ sudo apt-get install mailutils
 cat test | mail -s 'subject' dgdsingen@gmail.com
 ```
 
-## Mailing to remote domains not supported
 
-```sh
-sudo dpkg-reconfigure exim4-config
-```
-
-## Mac 한글파일명 자소분리 fix
-
-```sh
-sudo pip install nfd2nfc
-
-nfd2nfc 경로명
-```
 
 ## Date, Time, Timezone
 
