@@ -313,18 +313,27 @@ sudo pip install nfd2nfc
 nfd2nfc 경로명
 ```
 
-## Timezone
+## Date, Time, Timezone
 
 ```sh
-# TZ 환경변수를 설정하는 방법. 이 경우 date 명령어는 timezone이 바뀌지 않는다.
+# TZ 환경변수로 timezone 설정하기
 export TZ=Asia/Seoul
 
-# localtime 파일 복사 방법. 이 경우 date 명령어도 timezone이 바뀐다.
+# localtime 파일을 복사해서 timezone 설정하기. 만약 zoneinfo가 없다면 tzdata를 설치한다.
 cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
-# timedatectl 명령어 사용 방법. 이건 사실 명령어 내부적으로 localtime 파일 복사 방법을 사용한다.
-# 만약 timedatectl 명령어가 없다면 systemd를 설치한다.
+# timedatectl 명령어로 timezone 설정하기. 명령어 내부적으로는 localtime 파일 복사 방법을 사용하는 것으로 보인다.
+# 만약 timedatectl 명령어가 없다면 systemd를 설치한다. 그러나 container 내부에선 어차피 쓸 수 없으니 위 방식을 사용하자.
 timedatectl set-timezone Asia/Seoul
+
+# timedatectl 명령어로 datetime 설정하기
+timedatectl set-time "2022-06-06 15:00:00"
+
+# date 명령어로 datetime 설정하기
+date -s "2022-06-06 15:00:00"
+
+# ntp 활성화하기. ntp 활성화시 "Failed to set ntp: NTP not supported"라고 나오면 systemd-timesyncd를 설치한다.
+timedatectl set-ntp yes
 ```
 
 만약 Host에서 datetime을 변경한다면 그 위에 띄운 Container OS의 시간도 같이 바뀐다.
