@@ -348,6 +348,8 @@ xrandr -o normal
 
 # Monitoring
 
+top < htop < btop 순으로 좋음
+
 ## btop
 
 cpu, memory, disk, network 사용량을 GUI로 한번에 확인하고 싶다면 [btop](https://github.com/aristocratos/btop)을 사용한다.
