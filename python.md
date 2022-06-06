@@ -800,6 +800,21 @@ python3 -m tkinter
 
 
 
+# ntfy
+
+터미널 명령어로 OS notify를 보내준다.
+
+> https://github.com/dschep/ntfy
+
+```sh
+pip install nyft
+
+# 첫번째 커맨드 실행이 성공하면 success를, 실패하면 fail을 notify 해준다.
+sleep 3 && ntfy send success || ntfy send fail
+```
+
+
+
 # AsyncSSH
 
 > https://asyncssh.readthedocs.io/en/latest/
