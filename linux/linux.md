@@ -323,6 +323,7 @@ export TZ=Asia/Seoul
 cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 # timedatectl 명령어 사용 방법. 이건 사실 명령어 내부적으로 localtime 파일 복사 방법을 사용한다.
+# 만약 timedatectl 명령어가 없다면 systemd를 설치한다.
 timedatectl set-timezone Asia/Seoul
 ```
 
