@@ -368,10 +368,361 @@ cat /var/log/openvpnas.log | grep "POST_AUTH" | tail -15
 
 
 
+mac.py 스크립트 중 Mac Address 값을 'PASS'로 설정하면 필터링을 타지 않도록 로직을 추가한 버전
+
+```python
+# OpenVPN Access Server MAC address checking post_auth script.
+# Johan Draaisma
+#
+# This script can be used with LOCAL, PAM, LDAP, and RADIUS authentication.
+# It adds an additional check when authentication is done through the VPN connection.
+# It applies to all 3 connection profiles types (server-locked, user-locked, auto-login).
+# Windows, Linux, and macOS will be reporting MAC addresses. However, Android and iOS
+# devices will not, due to technical reasons. They will instead by reporting UUID. For
+# simplicity and legacy reasons we will just call it MAC address from here on in, but
+# it can be in theory any unique hardware-based string that the client reports to us.
+#
+# Please note: RADIUS/LDAP case insensitivity may lead to the system recognizing
+# Billy.Bob and billy.bob as 2 separate accounts, when using RADIUS/LDAP.
+#
+#
+# Full documentation and explanation can be found here:
+# https://openvpn.net/vpn-server-resources/access-server-post-auth-script-host-checking/
+#
+# Script last updated in January 2020
+
+import re
+
+from pyovpn.plugin import *
+
+# Optionally set this string to a known public IP address (such as the
+# public IP address of machines connecting from a trusted location, such
+# as the corporate LAN). If set, all users must do the first login from this
+# IP address, so the machine's hardware (MAC/UUID) address can be recorded.
+#
+# If this is empty, which it is by default, then registrations for the first
+# MAC address for a user account will be done automatically on first login.
+#
+# If this is set to "NONE" or "DISABLED" then the server administrator must
+# always manually register each MAC/UUID address by hand on the command line.
+# For that, we refer you to our documentation.
+first_login_ip_addr = "NONE"
+
+# If False or undefined, AS will call us asynchronously in a worker thread.
+# If True, AS will call us synchronously (server will block during call),
+# however we can assume asynchronous behavior by returning a Twisted
+# Deferred object.
+SYNCHRONOUS=False
+
+# this function is called by the Access Server after normal VPN or web authentication
+def post_auth(authcred, attributes, authret, info):
+    print("********** POST_AUTH %s %s %s %s" % (authcred, attributes, authret, info))
+
+    # get user's property list, or create it if absent
+    proplist = authret.setdefault('proplist', {})
+
+    # user properties to save - we will use this to pass the hw_addr_save property to be
+    # saved in the user property database.
+    proplist_save = {}
+
+    error = ""
+
+    # If a VPN client authentication attempt is made, do these steps:
+    # Check if there is a known MAC address for this client
+    # If not, register it
+    # If yes, check it
+    #
+    # An additional optional requirement is that first time registration must occur
+    # from a specific IP address, as specified in the first_login_ip_addr set above
+    #
+    # The 'error' text goes to the VPN client and is shown to the user.
+    # The 'print' lines go to the log file at /var/log/openvpnas.log (by default).
+
+    if attributes.get('vpn_auth'):                  # only do this for VPN authentication
+        hw_addr = authcred.get('client_hw_addr')    # MAC address reported by the VPN client
+        username = authcred.get('username')         # User name of the VPN client login attempt
+        clientip = authcred.get('client_ip_addr')   # IP address of VPN client login attempt
+        if hw_addr:
+            hw_addr_save = proplist.get('pvt_hw_addr')           # saved MAC address
+            hw_addr_save2 = proplist.get('pvt_hw_addr2')         # saved MAC address (secondary)
+            if hw_addr_save:
+                if hw_addr_save == 'PASS':
+                    print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+                    print("***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s" % hw_addr)
+                    print("***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s" % hw_addr_save)
+                    print("***** POST_AUTH MAC CHECK: Pass Validation")
+                    pass
+                elif not hw_addr == hw_addr_save and not hw_addr == hw_addr_save2:
+                    error = "The hardware MAC/UUID address reported by this VPN client does not match the registered address."
+                    print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+                    print("***** POST_AUTH MAC CHECK: client IP address         : %s" % clientip)
+                    print("***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s" % hw_addr)
+                    if hw_addr_save2:
+                        print("***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s or %s"  % (hw_addr_save, hw_addr_save2))
+                    else:
+                        print("***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s" % hw_addr_save)
+                    print("***** POST_AUTH MAC CHECK: connection attempt        : FAILED")
+                else:
+                    print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+                    print("***** POST_AUTH MAC CHECK: client IP address         : %s" % clientip)
+                    print("***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s" % hw_addr)
+                    if hw_addr_save2:
+                        print("***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s or %s" % (hw_addr_save, hw_addr_save2))
+                    else:
+                        print("***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s" % hw_addr_save)
+                    print("***** POST_AUTH MAC CHECK: connection attempt        : SUCCESS")
+
+            else:
+                # First login by this user, save MAC addr.
+                if not first_login_ip_addr or first_login_ip_addr == clientip:
+                    proplist_save['pvt_hw_addr'] = hw_addr
+                    print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+                    print("***** POST_AUTH MAC CHECK: client IP address         : %s" % clientip)
+                    print("***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s" % hw_addr)
+                    print("***** POST_AUTH MAC CHECK: action taken              : MAC address learned and locked.")
+                    print("***** POST_AUTH MAC CHECK: connection attempt        : SUCCESS")
+                else:
+                    error = "Your attempt to login from an address not approved for MAC/UUID address registration has been denied."
+                    print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+                    print("***** POST_AUTH MAC CHECK: client IP address         : %s" % clientip)
+                    print("***** POST_AUTH MAC CHECK: action taken              : attempt to register client MAC/UUID address from restricted address denied.")
+                    print("***** POST_AUTH MAC CHECK: connection attempt        : FAILED")
+
+        else:
+            error = "VPN client is not reporting a MAC/UUID address. Please verify that a suitable OpenVPN client is being used."
+            print("***** POST_AUTH MAC CHECK: account user name         : %s" % username)
+            print("***** POST_AUTH MAC CHECK: client IP address         : %s" % clientip)
+            print("***** POST_AUTH MAC CHECK: client MAC/UUID address   : NONE REPORTED")
+            print("***** POST_AUTH MAC CHECK: action taken              : VPN connection denied with a suitable error message.")
+            print("***** POST_AUTH MAC CHECK: connection attempt        : FAILED")
+
+    # process error, if one occurred
+    if error:
+        authret['status'] = FAIL
+        authret['reason'] = error          # this error string is written to the server log file
+        authret['client_reason'] = error   # this error string is reported to the client user
+
+    return authret, proplist_save
+```
+
+
+
 **Enable Client(Admin) to Client(All) Connection** 
 
 - OpenVPN > CONFIGURATION > Advanced VPN > Allow VPN users with Administrator privilege to access all VPN client IP addresses
 - OpenVPN > USER MANAGEMENT > Group Permissions > Group 선택 > More Settings > Access Control > Allow Access To groups: 전체 선택
+
+
+
+### Sample Config
+
+`sudo sacli ConfigQuery` 
+
+```json
+{
+  "admin_ui.https.ip_address": "all",
+  "admin_ui.https.port": "943",
+  "aui.eula_version": "3",
+  "auth.ldap.0.bind_dn": "uid=admin,cn=users,cn=accounts,dc=test,dc=com",
+  "auth.ldap.0.bind_pw": "password",
+  "auth.ldap.0.case_sensitive": "false",
+  "auth.ldap.0.enable": "false",
+  "auth.ldap.0.name": "My LDAP servers",
+  "auth.ldap.0.server.0.host": "ldap.test.com",
+  "auth.ldap.0.ssl_verify": "internal",
+  "auth.ldap.0.timeout": "4",
+  "auth.ldap.0.uname_attr": "uid",
+  "auth.ldap.0.use_ssl": "never",
+  "auth.ldap.0.user_exists_check": "true",
+  "auth.ldap.0.users_base_dn": "cn=users,cn=accounts,dc=test,dc=com",
+  "auth.module.post_auth_script": "# OpenVPN Access Server MAC address checking post_auth script.\n# Johan Draaisma\n#\n# This script can be used with LOCAL, PAM, LDAP, and RADIUS authentication.\n# It adds an additional check when authentication is done through the VPN connection.\n# It applies to all 3 connection profiles types (server-locked, user-locked, auto-login).\n# Windows, Linux, and macOS will be reporting MAC addresses. However, Android and iOS\n# devices will not, due to technical reasons. They will instead by reporting UUID. For\n# simplicity and legacy reasons we will just call it MAC address from here on in, but\n# it can be in theory any unique hardware-based string that the client reports to us.\n#\n# Please note: RADIUS/LDAP case insensitivity may lead to the system recognizing\n# Billy.Bob and billy.bob as 2 separate accounts, when using RADIUS/LDAP.\n#\n#\n# Full documentation and explanation can be found here:\n# https://openvpn.net/vpn-server-resources/access-server-post-auth-script-host-checking/\n#\n# Script last updated in January 2020\n\n\nimport re\n\nfrom pyovpn.plugin import *\n\n# Optionally set this string to a known public IP address (such as the\n# public IP address of machines connecting from a trusted location, such\n# as the corporate LAN). If set, all users must do the first login from this\n# IP address, so the machine's hardware (MAC/UUID) address can be recorded.\n#\n# If this is empty, which it is by default, then registrations for the first\n# MAC address for a user account will be done automatically on first login.\n#\n# If this is set to \"NONE\" or \"DISABLED\" then the server administrator must\n# always manually register each MAC/UUID address by hand on the command line.\n# For that, we refer you to our documentation.\nfirst_login_ip_addr = \"NONE\"\n\n# If False or undefined, AS will call us asynchronously in a worker thread.\n# If True, AS will call us synchronously (server will block during call),\n# however we can assume asynchronous behavior by returning a Twisted\n# Deferred object.\nSYNCHRONOUS=False\n\n# this function is called by the Access Server after normal VPN or web authentication\ndef post_auth(authcred, attributes, authret, info):\n    print(\"********** POST_AUTH %s %s %s %s\" % (authcred, attributes, authret, info))\n\n    # get user's property list, or create it if absent\n    proplist = authret.setdefault('proplist', {})\n\n    # user properties to save - we will use this to pass the hw_addr_save property to be\n    # saved in the user property database.\n    proplist_save = {}\n\n    error = \"\"\n\n    # If a VPN client authentication attempt is made, do these steps:\n    # Check if there is a known MAC address for this client\n    # If not, register it\n    # If yes, check it\n    #\n    # An additional optional requirement is that first time registration must occur\n    # from a specific IP address, as specified in the first_login_ip_addr set above\n    #\n    # The 'error' text goes to the VPN client and is shown to the user.\n    # The 'print' lines go to the log file at /var/log/openvpnas.log (by default).\n\n    if attributes.get('vpn_auth'):                  # only do this for VPN authentication\n        hw_addr = authcred.get('client_hw_addr')    # MAC address reported by the VPN client\n        username = authcred.get('username')         # User name of the VPN client login attempt\n        clientip = authcred.get('client_ip_addr')   # IP address of VPN client login attempt\n        if hw_addr:\n            hw_addr_save = proplist.get('pvt_hw_addr')           # saved MAC address\n            hw_addr_save2 = proplist.get('pvt_hw_addr2')         # saved MAC address (secondary)\n            if hw_addr_save:\n                if hw_addr_save == 'PASS':\n                    print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n                    print(\"***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s\" % hw_addr)\n                    print(\"***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s\" % hw_addr_save)\n                    print(\"***** POST_AUTH MAC CHECK: Pass Validation\")\n                    pass\n                elif not hw_addr == hw_addr_save and not hw_addr == hw_addr_save2:\n                    error = \"The hardware MAC/UUID address reported by this VPN client does not match the registered address.\"\n                    print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n                    print(\"***** POST_AUTH MAC CHECK: client IP address         : %s\" % clientip)\n                    print(\"***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s\" % hw_addr)\n                    if hw_addr_save2:\n                        print(\"***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s or %s\"  % (hw_addr_save, hw_addr_save2))\n                    else:\n                        print(\"***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s\" % hw_addr_save)\n                    print(\"***** POST_AUTH MAC CHECK: connection attempt        : FAILED\")\n                else:\n                    print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n                    print(\"***** POST_AUTH MAC CHECK: client IP address         : %s\" % clientip)\n                    print(\"***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s\" % hw_addr)\n                    if hw_addr_save2:\n                        print(\"***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s or %s\" % (hw_addr_save, hw_addr_save2))\n                    else:\n                        print(\"***** POST_AUTH MAC CHECK: expected MAC/UUID address : %s\" % hw_addr_save)\n                    print(\"***** POST_AUTH MAC CHECK: connection attempt        : SUCCESS\")\n\n            else:\n                # First login by this user, save MAC addr.\n                if not first_login_ip_addr or first_login_ip_addr == clientip:\n                    proplist_save['pvt_hw_addr'] = hw_addr\n                    print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n                    print(\"***** POST_AUTH MAC CHECK: client IP address         : %s\" % clientip)\n                    print(\"***** POST_AUTH MAC CHECK: client MAC/UUID address   : %s\" % hw_addr)\n                    print(\"***** POST_AUTH MAC CHECK: action taken              : MAC address learned and locked.\")\n                    print(\"***** POST_AUTH MAC CHECK: connection attempt        : SUCCESS\")\n                else:\n                    error = \"Your attempt to login from an address not approved for MAC/UUID address registration has been denied.\"\n                    print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n                    print(\"***** POST_AUTH MAC CHECK: client IP address         : %s\" % clientip)\n                    print(\"***** POST_AUTH MAC CHECK: action taken              : attempt to register client MAC/UUID address from restricted address denied.\")\n                    print(\"***** POST_AUTH MAC CHECK: connection attempt        : FAILED\")\n\n        else:\n            error = \"VPN client is not reporting a MAC/UUID address. Please verify that a suitable OpenVPN client is being used.\"\n            print(\"***** POST_AUTH MAC CHECK: account user name         : %s\" % username)\n            print(\"***** POST_AUTH MAC CHECK: client IP address         : %s\" % clientip)\n            print(\"***** POST_AUTH MAC CHECK: client MAC/UUID address   : NONE REPORTED\")\n            print(\"***** POST_AUTH MAC CHECK: action taken              : VPN connection denied with a suitable error message.\")\n            print(\"***** POST_AUTH MAC CHECK: connection attempt        : FAILED\")\n\n    # process error, if one occurred\n    if error:\n        authret['status'] = FAIL\n        authret['reason'] = error          # this error string is written to the server log file\n        authret['client_reason'] = error   # this error string is reported to the client user\n\n    return authret, proplist_save\n\n",
+  "auth.module.type": "ldap",
+  "auth.pam.0.service": "openvpnas",
+  "auth.radius.0.acct_enable": "false",
+  "auth.radius.0.name": "My Radius servers",
+  "cs.admin_only": "false",
+  "cs.ca_bundle": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+  "cs.cert": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+  "cs.cws.pwd_change": "true",
+  "cs.cws.pwd_strength": "true",
+  "cs.cws_proto_v2": "true",
+  "cs.cws_ui_offer.android": "false",
+  "cs.cws_ui_offer.autologin": "false",
+  "cs.cws_ui_offer.ios": "false",
+  "cs.cws_ui_offer.linux": "false",
+  "cs.cws_ui_offer.mac": "false",
+  "cs.cws_ui_offer.mac_v3": "true",
+  "cs.cws_ui_offer.server_locked": "true",
+  "cs.cws_ui_offer.user_locked": "true",
+  "cs.cws_ui_offer.win": "false",
+  "cs.cws_ui_offer.win_v3": "true",
+  "cs.https.ip_address": "all",
+  "cs.https.port": "943",
+  "cs.priv_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "cs.prof_sign_web": "true",
+  "cs.tls_version_min": "1.1",
+  "host.name": "stgvpn.test.io",
+  "sa.compression_warning_shown": "displayed",
+  "sa.initial_run_groups.0": "web_group",
+  "sa.initial_run_groups.1": "openvpn_group",
+  "subscription.bundle": "...",
+  "subscription.saved_state": "SUBSCRIPTION_OK,...",
+  "upgrade.current_version": "2.10.1",
+  "upgrade.initial_version": "2.10.1",
+  "vpn.client.basic": "false",
+  "vpn.client.cipher": "AES-256-CBC",
+  "vpn.client.config_text": "",
+  "vpn.client.routing.inter_client": "false",
+  "vpn.client.routing.reroute_dns": "custom",
+  "vpn.client.routing.reroute_gw": "false",
+  "vpn.client.routing.superuser_c2c_access": "true",
+  "vpn.daemon.0.client.netmask_bits": "20",
+  "vpn.daemon.0.client.network": "172.27.224.0",
+  "vpn.daemon.0.listen.ip_address": "all",
+  "vpn.daemon.0.listen.port": "443",
+  "vpn.daemon.0.listen.protocol": "tcp",
+  "vpn.daemon.0.server.ip_address": "all",
+  "vpn.general.osi_layer": "3",
+  "vpn.server.cipher": "AES-256-CBC",
+  "vpn.server.config_text": "",
+  "vpn.server.daemon.enable": "true",
+  "vpn.server.daemon.ovpndco": "false",
+  "vpn.server.daemon.protocols": "both",
+  "vpn.server.daemon.tcp.n_daemons": "4",
+  "vpn.server.daemon.tcp.port": "443",
+  "vpn.server.daemon.udp.n_daemons": "4",
+  "vpn.server.daemon.udp.port": "1194",
+  "vpn.server.data_ciphers": "",
+  "vpn.server.dhcp_option.dns.0": "172.30.111.100",
+  "vpn.server.dhcp_option.domain": "dev.test.com,prd.test.com",
+  "vpn.server.duplicate_cn": "true",
+  "vpn.server.enable_cipher_fallback": "false",
+  "vpn.server.foreign_bridge": "",
+  "vpn.server.google_auth.enable": "false",
+  "vpn.server.group_pool.0": "172.27.240.0/20",
+  "vpn.server.port_share.enable": "true",
+  "vpn.server.port_share.ip_address": "1.2.3.4",
+  "vpn.server.port_share.port": "1234",
+  "vpn.server.port_share.service": "admin+client",
+  "vpn.server.routing.gateway_access": "true",
+  "vpn.server.routing.private_access": "nat",
+  "vpn.server.routing.private_network.0": "172.31.69.24/32",
+  "vpn.server.routing.private_network.1": "172.30.111.100/32",
+  "vpn.server.routing.private_network.2": "172.21.70.72/32",
+  "vpn.server.tls_cc_security": "tls-crypt",
+  "vpn.server.tls_version_min": "1.2",
+  "vpn.tls_refresh.interval": "60",
+  "xmlrpc.relay_level": "1"
+}
+```
+
+
+
+`sudo sacli UserPropGet` 
+
+```json
+{
+  "Admin": {
+    "access_to.0": "+SUBNET:100.127.0.0/24",
+    "access_to.1": "+SUBNET:172.31.69.0/27",
+    "access_to.2": "+SUBNET:75.2.40.227/32",
+    "access_to.3": "+SUBNET:99.83.203.203/32",
+    "access_to.4": "+SUBNET:11.0.0.0/8",
+    "access_to.5": "+SUBNET:12.0.0.0/6",
+    "access_to.6": "+SUBNET:16.0.0.0/4",
+    "access_to.7": "+SUBNET:32.0.0.0/3",
+    "access_to.8": "+SUBNET:64.0.0.0/2",
+    "access_to.9": "+SUBNET:128.0.0.0/3",
+    "access_to.10": "+SUBNET:160.0.0.0/5",
+    "access_to.11": "+SUBNET:168.0.0.0/6",
+    "access_to.12": "+SUBNET:172.0.0.0/12",
+    "access_to.13": "+SUBNET:172.32.0.0/11",
+    "access_to.14": "+SUBNET:172.64.0.0/10",
+    "access_to.15": "+SUBNET:172.128.0.0/9",
+    "access_to.16": "+SUBNET:173.0.0.0/8",
+    "access_to.17": "+SUBNET:174.0.0.0/7",
+    "access_to.18": "+SUBNET:176.0.0.0/4",
+    "access_to.19": "+SUBNET:192.0.0.0/9",
+    "access_to.20": "+SUBNET:192.128.0.0/11",
+    "access_to.21": "+SUBNET:192.160.0.0/13",
+    "access_to.22": "+SUBNET:192.169.0.0/16",
+    "access_to.23": "+SUBNET:192.170.0.0/15",
+    "access_to.24": "+SUBNET:192.172.0.0/14",
+    "access_to.25": "+SUBNET:192.176.0.0/12",
+    "access_to.26": "+SUBNET:192.192.0.0/10",
+    "access_to.27": "+SUBNET:193.0.0.0/8",
+    "access_to.28": "+SUBNET:194.0.0.0/7",
+    "access_to.29": "+SUBNET:196.0.0.0/6",
+    "access_to.30": "+SUBNET:200.0.0.0/5",
+    "access_to.31": "+SUBNET:208.0.0.0/4",
+    "access_to.32": "+GROUP:Admin",
+    "access_to.33": "+GROUP:Developer",
+    "access_to.34": "+GROUP:Server",
+    "c2s_dest_s": "false",
+    "c2s_dest_v": "false",
+    "group_declare": "true",
+    "prop_autologin": "false",
+    "prop_deny": "false",
+    "prop_superuser": "true",
+    "type": "group"
+  },
+  "Developer": {
+    "access_to.0": "+SUBNET:172.31.69.149/32",
+    "c2s_dest_s": "false",
+    "c2s_dest_v": "false",
+    "group_declare": "true",
+    "prop_autologin": "false",
+    "prop_deny": "false",
+    "prop_superuser": "false",
+    "type": "group"
+  },
+  "Server": {
+    "access_to.0": "+SUBNET:172.21.70.72/32",
+    "c2s_dest_s": "false",
+    "c2s_dest_v": "false",
+    "group_declare": "true",
+    "prop_autologin": "true",
+    "prop_deny": "false",
+    "prop_superuser": "false",
+    "type": "group"
+  },
+  "__DEFAULT__": {
+    "def_deny": "false",
+    "prop_autogenerate": "true",
+    "prop_force_lzo": "false",
+    "type": "user_default"
+  },
+  "admin": {
+    "type": "user_connect"
+  },
+  "user_admin": {
+    "access_to.0": "+NAT:172.31.247.3/32",
+    "conn_group": "Admin",
+    "prop_superuser": "true",
+    "pvt_google_auth_secret": "...",
+    "pvt_google_auth_secret_locked": "false",
+    "pvt_hw_addr": "11:22:3a:4b:c5:6d",
+    "type": "user_compile"
+  },
+  "user_server": {
+    "access_from.0": "+ALL_VPN_CLIENTS",
+    "access_to.0": "+NAT:172.21.70.72/32",
+    "conn_group": "Server",
+    "prop_autologin": "true",
+    "pvt_hw_addr": "PASS",
+    "type": "user_compile"
+  },
+  "user_openvpn": {
+    "access_from.0": "+ALL_S2C_SUBNETS",
+    "prop_superuser": "true",
+    "pvt_google_auth_secret": "...",
+    "pvt_google_auth_secret_locked": "true",
+    "pvt_password_digest": "...",
+    "type": "user_compile",
+    "user_auth_type": "local"
+  }
+}
+```
 
 
 
