@@ -279,7 +279,7 @@ Node 설정시 필요한 Service account를 생성한다.
         - Access scopes:
             - Enable sandbox with gVisor : Off
         - Shielded options :
-            - Enable integrity testtoring : On
+            - Enable integrity monitoring : On
             - Enable secure boot : Off
     - NODE POOLS > default-pool > Metadata
         - Kubernetes labels: Node affinity를 위해 필요한 경우 설정
@@ -765,13 +765,13 @@ python3 pubsub_sub.py
 
 
 
-# testtoring
+# Monitoring
 
 ## Alert
 
-> https://cloud.google.com/testtoring/alerts
+> https://cloud.google.com/monitoring/alerts
 
-- GCP > testtoring > Alerting
+- GCP > Monitoring > Alerting
     - EDIT NOTIFICATION CHANNELS > alert 받을 채널 등록
     - CREATE POLICY > alert 받을 policy 등록
 - GCP > Error Reporting > CONFIGURE NOTIFICATIONS > error report 받을 채널 등록
@@ -827,9 +827,9 @@ severity=ERROR AND jsonPayload.message!~"(?i)Exception|Error" AND jsonPayload.me
 > [google-fluentd releases](https://github.com/GoogleCloudPlatform/google-fluentd/releases) 
 
 ```sh
-# Cloud testtoring agent
-curl -sSO https://dl.google.com/cloudagents/add-testtoring-agent-repo.sh
-sudo bash add-testtoring-agent-repo.sh
+# Cloud monitoring agent
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+sudo bash add-monitoring-agent-repo.sh
 sudo apt-get update
 sudo apt-get install stackdriver-agent
 
@@ -1182,8 +1182,8 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
 - What is the foundational process at the base of Google's Site Reliability Engineering (SRE) ?
     - Capacity planning
     - Testing and release procedures
-    - **testtoring**
-        - Before you can take any of the other actions, you must first be testtoring the system.
+    - **Monitoring**
+        - Before you can take any of the other actions, you must first be monitoring the system.
     - Root cause analysis
 - What is the purpose of the Stackdriver Trace service?
     - **Reporting on latency as part of managing performance**
@@ -1191,12 +1191,12 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
     - Reporting on GCP system errors
     - Reporting on application errors
     - Reporting on GCP resource consumption as part of managing performance
-- Stackdriver integrates several technologies, including testtoring, logging, error reporting, and debugging, that are commonly implemented in other environments as separate solutions using separate products. What are key benefits of integration of these services?
+- Stackdriver integrates several technologies, including monitoring, logging, error reporting, and debugging, that are commonly implemented in other environments as separate solutions using separate products. What are key benefits of integration of these services?
     - **Reduces overhead, reduces noise, streamlines use, and fixes problems faster**
         - Stackdriver integration streamlines and unifies these traditionally independent services, making it much easier to establish procedures around them and to use them in continuous ways.
     - Ability to replace one tool with another from a different vendor
     - Detailed control over the connections between the technologies
-    - Better for GCP only so long as you don't need to testtor other applications or clouds
+    - Better for GCP only so long as you don't need to monitor other applications or clouds
 - What is the purpose of virtual private networking (VPN)?
     - It is a method to detect intruders at the edge of a network boundary.
     - VPNs are also called access control lists, or ACLs, and they limit network access.
@@ -1269,7 +1269,7 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
     - Implements user-defined encryptions with user supplied keys.
     - **Pass key:value pairs to the VM, including a literal script or a reference to a script file.**
         - Passes key:value pairs.
-    - Change which information for a VM is testtored by Stackdriver.
+    - Change which information for a VM is monitored by Stackdriver.
 - What kinds of files form the Deployment Manager templates?
     - Templates are composed of *.yaml, java, and Node.js files.
     - **Templates are composed of *.yaml, python, and jinja2 files.**
@@ -1305,7 +1305,7 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
         - Fast to start a cluster.
     - Dataproc allows full control over HDFS advanced settings.
     - Dataproc billing occurs in 10-hour intervals.
-    - It doesn't integrate with Stackdriver, but it has its own testtoring system.
+    - It doesn't integrate with Stackdriver, but it has its own monitoring system.
 - What is Cloud Pub/Sub?
     - A feature of Google Maps that identifies bars and sandwich restaurants.
     - A feature of Google console that allows you to subscribe to Cloud news feeds.
