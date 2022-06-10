@@ -475,7 +475,7 @@ Mac에서는 `brew install k9s` , Linux에서는 https://github.com/derailed/k9s
 
 ## node-shell
 
-Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 Node에 띄워서 접속하면 되는데, 이를 자동화해주는 도구다.
+Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 Node에 띄워서 접속하면 되는데, 이를 자동화해주는 도구.
 
 > https://github.com/kvaps/kubectl-node-shell
 
@@ -495,7 +495,7 @@ helm repo update
 helm install prometheus prometheus-community/prometheus
 ```
 
-이후 아래와 같은 svc가 생성된다. 이 중 prometheus-server를 LB, DNS에 등록하여 접속 잘 되면 OK.
+이후 아래와 같은 service가 생성된다. 이 중 prometheus-server를 LB, DNS에 등록하여 접속 잘 되면 prometheus는 준비되었다.
 
 ```sh
 # k get svc | grep prometheus
@@ -508,7 +508,7 @@ prometheus-server               ClusterIP   100.64.36.205   <none>        80/TCP
 
 
 
-Grafana를 실행한다. 초기 계정은 admin / admin 이다.
+grafana를 docker로 띄워서 테스트해본다. 초기 계정은 admin / admin 이다.
 
 ```sh
 docker run -d -p 3000:3000 --name grafana grafana/grafana-oss
@@ -532,27 +532,19 @@ git clone https://github.com/grafana/helm-charts.git
 ```diff
 -replicas: 1
 +replicas: 2
- 
- ## Create a headless service for the deployment
- headlessService: false
-@@ -151,7 +151,7 @@ podPortName: grafana
- ##
- service:
+
+service:
    enabled: true
 -  type: ClusterIP
 +  type: LoadBalancer
    port: 80
    targetPort: 3000
-     # targetPort: 4181 To be used with a proxy extraContainer
-@@ -335,7 +335,7 @@ initChownData:
- 
- # Administrator credentials when not using an existing secret (see below)
- adminUser: admin
+
+adminUser: admin
 -# adminPassword: strongpassword
 +adminPassword: admin
- 
- # Use an existing secret for the admin user.
- admin:
+
+admin:
 @@ -587,6 +587,12 @@ grafana.ini:
      mode: console
    grafana_net:
@@ -565,10 +557,89 @@ git clone https://github.com/grafana/helm-charts.git
 +    password: 1212
 ```
 
+mysql을 설치한다.
+
 ```sh
-# mysql을 먼저 설치한다.
 cd $ROOT_DIR
-kubectl apply -f mysql.yml
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+    tier: mysql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+type: Opaque
+data:
+  # echo -n 1212 | base64
+  password: MTIxMg==
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:8.0.26
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: grafana
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql
+EOF
 
 # chart 내용을 변경한 경우 반드시 update를 한번 해주자
 cd helm-charts/charts

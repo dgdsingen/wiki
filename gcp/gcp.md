@@ -150,7 +150,7 @@ Cloud SQL에 Private IP를 부여하기 위해서는 VPC에 Private Service Conn
 
 이 때는 아래와 같이 Private Service Connection 용 신규 subnet을 만들어준다.
 
-- GCP Console > Project 선택 > VPC network > VPC networks > vpc-homin-share-devstg 선택 > PRIVATE SERVICE CONNECTION > ALLOCATED IP RANGES FOR SERVICES > ALLOCATE IP RANGE 버튼 클릭 후 아래와 같이 생성
+- GCP Console > Project 선택 > VPC network > VPC networks > vpc-test-share-dev 선택 > PRIVATE SERVICE CONNECTION > ALLOCATED IP RANGES FOR SERVICES > ALLOCATE IP RANGE 버튼 클릭 후 아래와 같이 생성
     - Name: allocip-test-sql
     - IP range: Custom, 100.127.0.0/24
         - 원래 100.64.0.0/10 대역은 비표준 Private IP 대역이다. 그러나 IP range도 넓고 비표준 대역이라 타 네트워크와 쫑날 가능성이 매우 적어서 한정적으로 사용되고 있을 가능성이 높다. 해당 대역의 끝 부분을 Private Service Connection 용으로 할당할 수 있다.
@@ -159,6 +159,478 @@ Cloud SQL에 Private IP를 부여하기 위해서는 VPC에 Private Service Conn
 - 또한 Routes > peering-route-12345 가 자동으로 생성된 것을 확인할 수 있음
 
 이후 sql-pg-test 생성이 잘 되고 GCP 내 서버에서의 접속도 문제없는 것을 확인할 수 있다.
+
+
+
+# GKE
+
+## Create Cluster
+
+반드시 순서대로 진행한다. 예를 들어 Service account를 생성하지 않고 바로 Cluster 생성부터 하면 Cluster 설정 중 Service account를 선택하는 화면에서 막힌다. 그 때 가서 Service account를 새로 만든다 해도 Cluster 설정 화면을 Refresh 해야만 새로 만든 Service account를 불러올 수 있으므로 그 동안 해둔 Cluster 설정이 다 날아가서 어차피 다시 설정하게 된다.
+
+
+
+GKE 사용시 필요한 API를 Enable 한다.
+
+- GCP > 아래 서비스들 검색 후 들어가서 API Enable
+    - Network API
+    - Compute API
+    - Kubernetes API
+
+
+
+Cluster에서 사용할 Network의 IP CIDR를 미리 계산한다. ([Subnet Calculator](https://www.davidc.net/sites/default/subnets/subnets.html) 참조)
+
+
+
+
+Network를 생성한다.
+
+- GCP > Project: pjt-test-share-dev > VPC network > VPC networks > vpc-test-share-dev 클릭 > ADD SUBNET
+    - NAME: sbn-{region}-{project}-{env} (ex: sbn-an3-test-dev)
+    - VPC Network: vpc-test-share-dev
+    - Region: asia-northeast3
+    - Purpose: None
+    - IP address range: 172.31.69.192/28 (위에서 계산한 IP CIDR)
+    - CREATE SECONDARY IP RANGE > Secondary IP ranges 로 변경됨
+        - Subnet range name: sbn-an3-test-dev-pod, Secondary IP range: 100.64.60.0/22 (위에서 계산한 IP CIDR)
+        - Subnet range name: sbn-an3-test-dev-svc, Secondary IP range: 100.64.57.0/24 (위에서 계산한 IP CIDR)
+    - Private Google Access : On
+    - Flow logs : On
+- GCP > Project: pjt-test-share-dev > VPC network > Shared VPC > ATTACHED PROJECTS > ATTACH PROJECTS 클릭
+    - Attached projects: 해당 프로젝트 찾아 선택 (ex: pjt-test-test-dev)
+    - VPC network permissions
+        - Compute Instance Admins: On
+        - Compute Network Admins: On
+        - Owners: On
+        - Editors: On
+    - Kubernetes Engine access : Enabled
+    - Sharing mode: Individual subnets (subnet-level permissions)
+    - Subnets to share : sbn-{region}-{project}-{env} (ex: sbn-an3-test-dev. 위에서 만든 Subnet)
+
+
+
+Node 설정시 필요한 Service account를 생성한다.
+
+- GCP > Project: Cluster 만들려는 Project > IAM & Admin > Service Accounts > CREATE SERVICE ACCOUNT
+    - Service account details
+        - Service account name : svcacc-gke-{project}-{env} (ex: svcacc-gke-test-dev)
+        - Service account ID : svcacc-gke-{project}-{env} (ex: svcacc-gke-test-dev)
+    - Grant this service account access to project (optional)
+        - Kubernetes Engine Admin
+        - Kubernetes Engine Cluster Admin
+        - Kubernetes Engine Cluster Viewer
+        - Kubernetes Engine Developer
+        - Kubernetes Engine Host Service Agent User
+        - Kubernetes Engine Viewer
+        - Kubernetes Engine Service Agent
+- GCP > IAM & Admin > IAM
+    - Filter: svcacc-gke-test-dev (위에서 만든 Service account) 넣고 검색해서 Role이 잘 들어갔는지 확인
+- GCP > IAM & Admin > Service Accounts > svcacc-gke-test-dev (위에서 만든 Service account) 클릭 > KEYS > ADD KEY > Create new key
+    - Key type : JSON
+    - CREATE 클릭하면 json 파일 받아짐. 이후 `kubectl create secret generic credential-json --from-file={PATH_TO_FILE}` 로 사용함
+
+
+
+
+이제 GKE Cluster를 생성한다.
+
+- GCP > Kubernetes Engine > Clusters > CREATE > GKE Standard
+    - Cluster basics
+        - Name: gkecls-{region}-{project}-{env} (ex: gkecls-an3-test-dev)
+        - Location type: Regional, asia-northeast3
+        - Specify default node locations: Off (Current default: 3 zones from asia-northeast3)
+        - Control plane version: Static version, 1.21.5-gke.1302 (default)
+    - NODE POOLS > default-pool
+        - Name: gkecls-{region}-{project}-{env} (ex: gkecls-an3-test-dev)
+        - Node version: 1.21.5-gke.1302 (control plane version)
+        - Size: 
+            - Number of nodes (per zone): 2 (Node 당 최대 110개 Pod 할당 가능하므로, Pod 개수에 따라 결정. [IP 주소 할당 최적화](https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr) 참조)
+            - Enable autoscaling: On
+                - Minimum number of nodes (per zone): 2 (최소로 유지되어야 하는 갯수 정의)
+                - Maximum number of nodes (per zone): 2 (이 경우 2대로만 유지하겠다는 의미)
+            - Specify node locations: Off
+        - Automation
+            - Enable auto-upgrade: On
+            - Enable auto-repair: On
+            - Surge upgrade:
+                - Max surge: 1
+                - Max unavailable: 0
+    - NODE POOLS > default-pool > Nodes
+        - Image type: Ubuntu with Containerd (ubuntu_containerd)
+        - Machine Configuration
+            - Machine family: GENERAL-PURPOSE
+            - Series: E2
+            - Machine type: e2-standard-4 (Pod에서 쓰는 CPU/RAM과 갯수에 따라 결정. [K8s instance calculator](https://learnk8s.io/kubernetes-instance-calculator) 참조)
+            - Boot disk type: SSD persistent disk
+            - Boot disk size (GB): 100
+            - Enable customer-managed encryption for boot disk: Off
+            - Enable preemptible nodes: Off
+        - Networking
+            - Maximum Pods per node: 64
+                - 이 경우 자동으로 Mask for Pod address range per node: /25로 설정되어 Node 당 Pod용 IP를 128개 사용하게 된다. [IP 주소 할당 최적화](https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr) 참조.
+                - 자동으로 IP CIDR가 Pod 개수의 2배가 되는 이유는 다음과 같다. 갑자기 한 노드가 죽는 경우 등 발생시 다른 노드가 Pod를 받아주면서 일시적으로 한 Node의 Pod 개수가 2배가 될 수 있다. 그러므로 (Node 당 Pod 개수 * 2) = Node 당 IP 개수로 보고 Pod Subnet에서 가용한 최대 IP 갯수를 넘지 않도록 계산한다.
+                - 예를 들면 Pod Subnet이 /22인 경우 가용한 IP는 총 1024개다. 이 때 Node가 6대라면 1024 / 6 = Node 당 Pod IP 최대 개수는 170개가 된다. Node 별 Pod IP 대역은 CIDR로 할당하기 때문에 /25 = 128개가 부여 가능한 최대치가 된다. 그럼 Node 별 IP 개수 128 / 2 = Pod 개수이므로 이 경우 Node 당 Pod 개수는 64개가 최대값이다. 이 경우 Node 당 IP를 128개 주면 IP 총량 1024개 중 256개가 남는다. 이는 Node를 2대 더 추가할 수 있는 수치지만 Region에 Zone이 3개고 Node를 균등 배포한다면 Node 대수는 3,6,9... 3의 배수이므로 Node 6대가 최대치가 된다. Node 9대인 경우 Node 당 IP 128개 * Node 9대 = 1152개이므로 Node 대수를 늘리고 싶으면 Node 당 Pod 대수를 줄여야 한다.
+            - Network tags: sgtag-gke-{region}-{project}-{env} (ex: sgtag-gke-an3-test-dev)
+            - Node Pool Pod Address Range
+                - Automatically create secondary ranges: Off
+    - NODE POOLS > default-pool > Security
+        - Service account: 위에서 만든 svcacc-gke-{project}-{env} 선택 (ex: svcacc-gke-test-dev)
+        - Access scopes:
+            - Enable sandbox with gVisor : Off
+        - Shielded options :
+            - Enable integrity testtoring : On
+            - Enable secure boot : Off
+    - NODE POOLS > default-pool > Metadata
+        - Kubernetes labels: Node affinity를 위해 필요한 경우 설정
+        - Node taints: 필요한 경우 설정
+        - GCE instance metadata:
+            - Key: disable-legacy-endpoints, Value: true (default)
+    - Cluster > Automation
+        - 설정 안함
+    - Cluster > Networking
+        - Networks in this project : Off
+        - Networks shared with me (from host project: pjt-test-share-dev): On
+            - Network: vpc-test-share-dev (pjt-test-share-dev Project의 Shared VPC를 사용하므로 해당 Env에 맞는 Shared VPC 선택)
+            - Node subnet: 위에서 만든 sbn-{region}-{project}-{env} (ex: sbn-an3-test-dev)
+            - Public cluster: Off
+            - Private cluster: On
+                - Access control plane using its external IP address: Off (DEV/STG 환경: Off, PRD 환경: On. On 시 Control Node 접근 endpoint에 EIP 부여됨)
+                - Enable Control plane global access: Off
+                - Control plane IP range: 100.64.0.128/28 (위에서 계산한 IP CIDR)
+                    - I conform that my configuration includes a range outside of the RFC 1918 address space: On
+                - Disable Default SNAT : Off (DEV/STG 환경: Off, PRD 환경: On)
+            - Advanced networking options
+                - Enable VPC-native traffic routing (uses alias IP): On
+                - Automatically create secondary ranges: Off
+                    - Pod secondary CIDR range : 위에서 만든 sbn-{region}-{project}-{env}-pod (ex: sbn-an3-test-dev-pod)
+                    - Maximum Pods per node: 64
+                    - Services secondary CIDR range: 위에서 만든 sbn-{region}-{project}-{env}-svc (ex: sbn-an3-test-dev-svc)
+                    - Enable Dataplane V2: Off
+                    - Enable Kubernetes Network Policy: On
+                    - Enable Intranode visibility: On
+                    - Enable NodeLocal DNSCache: Off
+                    - Enable HTTP load balancing: On
+                    - Enable subsetting for L4 internal load balancers: Off
+                    - Enable control plane authorized networks: On
+                        - Name: authnet-vpc-test-share-dev
+                        - Network: 172.31.69.0/27 (Control Plane에 접속할 수 있는 대역을 의미함. DEV/STG 환경에서의 kubectl VM이 172.31.69.0/27 대역에 있음. DEV/STG CI/CD 서버 > DEV/STG Cluster로 접근이 필요하므로 같은 DEV/STG 환경에서는 Private IP 입력함. DEV/STG CI/CD 서버 > PRD Cluster로 접근시에는 VPC가 다르기 때문에 Public IP 34.64.239.139/32 대역 접속을 허용해줌)
+    - Cluster > Security
+        - 설정 안함
+    - Cluster > Metadata
+        - 설정 안함
+    - Cluster > Features
+        - 설정 안함
+
+
+
+## Config Cluster
+
+### AuthZ
+
+GCP > Project: pjt-test-share-dev > Compute Engine > VM instances > vm-an3-kubectl 을 통해서 DEV/STG/PRD GKE Cluster에 접속한다. 그 전에 vm-an3-kubectl에서 사용하는 Service account에서 Cluster에 admin 권한으로 접근할 수 있도록 권한 부여를 해준다.
+
+- GCP > Project: 접속하려는 Cluster가 속한 Project > IAM & Admin > IAM > ADD
+    - New principals: svcacc-vm-kubectl@pjt-test-share-dev.iam.gserviceaccount.com
+    - Select a role: Kubernetes Engine Admin 
+
+
+
+### Connect to Cluster
+
+GCP > Cloud Shell에서 아래 Command를 실행해 vm-an3-kubectl 에 접속한다.
+
+```sh
+gcloud compute ssh vm-an3-kubectl --zone asia-northeast3-c --project pjt-test-share-dev
+```
+
+혹은 GCP > Compute Engine > VM instances > vm-an3-kubectl 우측 Connect 아래 SSH 버튼 오른쪽 화살표를 누르면 View gcloud command 버튼이 있는데 클릭 후 RUN IN CLOUD SHELL 선택하면 자동으로 Cloud Shell 통해서 접속한다.
+
+
+
+관리용 User로 Switch
+
+```sh
+sudo su - hip-dev
+
+# 필요한 경우 User, Auth 설정
+sudo su -
+sudo echo '%test-sudoers ALL=(ALL:ALL) NOPASSWD:ALL' >  /etc/sudoers.d/test_sudoers; \
+sudo chmod 0440 /etc/sudoers.d/test_sudoers; \
+sudo groupadd -g 2000 test-sudoers
+sudo useradd -m -u 2001 -G 2000 est-dev; sudo passwd est-dev
+# Enter new UNIX password: Ruswjrthffntus21!
+
+sudo sed -i 's/PasswordAuthentication\ no/PasswordAuthentication\ yes/g' /etc/ssh/sshd_config; sudo systemctl restart sshd
+sudo su - est-dev
+id
+# uid=2001(est-dev) gid=2001(est-dev) groups=2001(est-dev),2000(test-sudoers) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+```
+
+
+
+kubectx 설정
+
+```sh
+# Cluster credentials 가져오기
+gcloud container clusters get-credentials gkecls-an3-test-dev --project=pjt-test-test-dev --region=asia-northeast3
+# Fetching cluster endpoint and auth data.
+# kubeconfig entry generated for gkecls-an3-test-dev. (~/.kube/config 에 생성됨)
+
+# alias 설정
+kubectx test-dev=gke_pjt-test-test-dev_asia-northeast3_gkecls-an3-test-dev
+
+# context 변경
+kubectx test-dev
+```
+
+
+
+필요한 경우 Firewall을 확인하자.
+
+- GCP > Project: pjt-test-share-dev (Shared VPC를 사용하므로, Subnet과 그에 해당하는 Firewall도 그쪽 환경에 있음)
+
+
+
+### Deploy Default Configs
+
+아래 명령어로 ip-masq-agent DaemonSet이 클러스터에 배포가 되어있는 지 확인함.
+
+IP Masquerading이란 일종의 NAT로, Pod에서 클러스터 외부의 대상으로 통신할 때, Source IP가 Pod의 IP가 아니라 Node의 IP로 변환되도록 함.
+
+```sh
+kubectl get ds ip-masq-agent -n kube-system
+```
+
+없으면 아래와 같이 설정 적용
+
+```yaml
+# non-masquerade-cidrs.yml
+
+nonMasqueradeCIDRs:
+  - 100.64.60.0/22 # Cluster에서 사용하는 Pod의 IP대역
+  - 100.64.57.0/24 # Cluster에서 사용하는 Service의 IP대역
+  - 100.64.2.0/26 # proxy-only subnet 대역
+```
+
+```sh
+kubectl create configmap ip-masq-agent --from-file non-masquerade-cidrs.yml --namespace kube-system
+kubectl describe configmap ip-masq-agent -n kube-system
+```
+
+```yaml
+# ip-masq-agent.yaml
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ip-masq-agent
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: ip-masq-agent
+  template:
+    metadata:
+      labels:
+        k8s-app: ip-masq-agent
+    spec:
+      hostNetwork: true
+      containers:
+      - name: ip-masq-agent
+        image: k8s.gcr.io/networking/ip-masq-agent-amd64:v2.6.0
+        args:
+            - --masq-chain=IP-MASQ
+            # To non-masquerade reserved IP ranges by default, uncomment the line below.
+            # - --nomasq-all-reserved-ranges
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: /etc/config
+      volumes:
+        - name: config
+          configMap:
+            # Note this ConfigMap must be created in the same namespace as the
+            # daemon pods - this spec uses kube-system
+            name: ip-masq-agent
+            optional: true
+            items:
+              # The daemon looks for its config in a YAML file at /etc/config/ip-masq-agent
+              - key: config
+                path: ip-masq-agent
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+```
+
+```sh
+kubectl apply -f ip-masq-agent.yaml
+```
+
+Worker Node로 접속해서 잘 적용되었는지 확인
+
+```sh
+sudo iptables -t nat -L IP-MASQ
+
+# 아래와 같이 위에서 설정한 사항이 보이면 정상
+# 참고로 169.254.0.0/16는 Metadata 관리를 위한 서버 주소이므로 반드시 존재해야 함
+Chain IP-MASQ (1 references)
+target     prot opt source               destination
+RETURN     all  --  anywhere             169.254.0.0/16       /* ip-masq-agent: local traffic is not subject to MASQUERADE */
+RETURN     all  --  anywhere             100.64.60.0/22       /* ip-masq-agent: local traffic is not subject to MASQUERADE */
+RETURN     all  --  anywhere             100.64.57.0/24       /* ip-masq-agent: local traffic is not subject to MASQUERADE */
+RETURN     all  --  anywhere             100.64.2.0/26        /* ip-masq-agent: local traffic is not subject to MASQUERADE */
+MASQUERADE  all  --  anywhere             anywhere             /* ip-masq-agent: outbound traffic is subject to MASQUERADE (must be last in chain) */
+```
+
+
+
+ClusterRoleBinding 적용. Pod들이 Default Service Account를 갖고 기동되는데, 권한을 cluster-admin으로 주는 것이 편함.
+
+```yaml
+# clsrolebinding-default.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: clsrolebinding-default
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+```
+
+```sh
+kubectl apply -f clsrolebinding-default.yaml
+```
+
+
+
+위에서 "Create Cluster" 진행시 생성한 Node 관리용 Service account key를 Cluster에 적용
+
+Pod에서 GKE Service Account JSON Keyfile을 Volume mount 하는 경우가 있으므로, JSON Keyfile을 Kubernetes Secret으로 만들어 배포해야 함. 이름은 credential-json으로 해야 함.
+
+```sh
+kubectl create secret generic credential-json --from-file=svcacc-gke-test-dev.json
+```
+
+
+
+### Create NEG (Network Endpoint Group)
+
+> https://cloud.google.com/load-balancing/docs/negs
+
+GCP에서는 NEG라는 k8s service type을 사용할 수 있다.
+
+service type을 그냥 LoadBalancer로 하면 GCP LB의 구성요소인 Forwarding Rule, Target Proxy, URL Map, Backend까지 모두 생성된다.
+
+그러나 NEG type으로 만들면 Forwarding Rule, Target Proxy, URL Map, Backend 모두 생성되지 않는다. 대신 Backend을 새로 만들때 보면 해당 NEG를 target instance로 선택할 수 있게 뜬다. 즉 기존 LB에 Backend를 추가하는 경우에 사용하면 된다. 이 경우 LB 갯수가 줄어들어 아키텍처가 심플해지고 IP도 아끼는 장점이 있다.
+
+NEG를 실제 설정하는 방법은 다음과 같다. 연결할 서비스를 확인하고 수정하자.
+
+```sh
+kubectl get svc
+kubectl describe svc test-skywalking-ui
+kubectl edit svc test-skywalking-ui
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    # 아래 설정 추가시 자동으로 NEG가 만들어진다. NEG의 Port는 LB로 노출할 Port를 기입하면 된다.
+    cloud.google.com/neg: '{"exposed_ports": {"80":{"name": "neg-an3-test-hipdev-skywalking-ui"}}}' # Cluster Port
+    # 여러 Port를 정의하려면 아래와 같이 기입한다.
+    #cloud.google.com/neg: '{"exposed_ports": {"11800":{"name": "neg-an3-test-dev-skywalking-oap-11800"},"12800":{"name": "neg-an3-test-dev-skywalking-oap-12800"}}}'
+    meta.helm.sh/release-name: test-skywalking
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2021-11-23T00:20:42Z"
+  labels:
+    app: test-skywalking
+    app.kubernetes.io/managed-by: Helm
+    chart: skywalking-4.1.0
+    component: ui
+    heritage: Helm
+    release: test-skywalking
+  name: test-skywalking-ui
+  namespace: default
+  resourceVersion: "3288065"
+  uid: 6b24557e-e4e4-494a-b836-e394e3a127fe
+spec:
+  clusterIP: 100.64.57.162
+  clusterIPs:
+  - 100.64.57.162
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80 # Cluster Port
+    protocol: TCP
+    targetPort: 8080 # Container Port
+  selector:
+    app: test-skywalking
+    component: ui
+    release: test-skywalking
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+```
+
+
+
+생성된 NEG 및 Service 상태 확인
+
+```sh
+kubectl get svcneg
+kubectl get svc test-skywalking-ui -o yaml
+```
+
+```yaml
+...
+metadata:
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"80":{"name": "neg-an3-test-hipdev-skywalking-ui"}}}'
+    # 아래와 같이 NEG Status가 업데이트되는 것이 확인된다.
+    cloud.google.com/neg-status: '{"network_endpoint_groups":{"80":"neg-an3-test-hipdev-skywalking-ui"},"zones":["asia-northeast3-a","asia-northeast3-b","asia-northeast3-c"]}'
+...
+```
+
+
+
+NEG 수동 추가는 아래와 같이 진행한다. 이 경우 `kubectl get svcneg` 에 나오지 않음.
+
+- GCP > Compute Engine > Network endpoint groups > CREATE NETWORK ENDPOINT GROUP
+    - Name: neg-an3-test-dev-skywalking-ui
+    - Network endpoint group type: Network endpoint group (Zonal)
+        - Networks in this project: Off
+        - Networks shared with me (from host project: "pjt-test-share-dev"): On
+        - Shared subnetwork: sbn-an3-test-dev (172.31.69.192/28, asia-northeast3)
+        - Zone: asia-northeast3-a (각 Zone 마다 NEG를 생성해야함)
+    - Default port: 8080 (해당 서비스 포트)
+- GCP > Compute Engine > Network endpoint groups > Pod 구동중인 존 (Zonal (asia-northeast3-b)) 확인 후 해당 NEG 클릭
+    - VM Instance : gke-gkecls-an3-test--gkecls-an3-test--1d96e182-6w3l
+    - New Network endpoints:
+        - IP address: 100.64.62.3 (kubectl describe svc test-skywalking-ui 에 있는 Endpoints IP 입력. Endpoints: 100.64.62.3:8080)
+        - Port type: Default
+        - Port number: 8080
+
+
+
+## Issues
+
+- LB의 Backend를 NEG로 연결할 때 health check를 생성하는데, 만약 protocol이 http라면 health check path를 기본값 `/` 대신 `/actuator/health` 등 200 응답을 주는 path로 지정해야 한다. 그렇지 않으면 health check 결과가 fail로 떠서 라우팅이 되지 않는다.
+- health check 생성 후 fail이 뜬다면 [firewall 설정](https://cloud.google.com/load-balancing/docs/health-checks?hl=ko#firewall_rules)이 잘 되어 있는지 확인하자. GCP health check > Backend target instance로의 ingress firewall이 오픈되어 있어야 한다.
 
 
 
@@ -293,13 +765,13 @@ python3 pubsub_sub.py
 
 
 
-# Monitoring
+# testtoring
 
 ## Alert
 
-> https://cloud.google.com/monitoring/alerts
+> https://cloud.google.com/testtoring/alerts
 
-- GCP > Monitoring > Alerting
+- GCP > testtoring > Alerting
     - EDIT NOTIFICATION CHANNELS > alert 받을 채널 등록
     - CREATE POLICY > alert 받을 policy 등록
 - GCP > Error Reporting > CONFIGURE NOTIFICATIONS > error report 받을 채널 등록
@@ -355,9 +827,9 @@ severity=ERROR AND jsonPayload.message!~"(?i)Exception|Error" AND jsonPayload.me
 > [google-fluentd releases](https://github.com/GoogleCloudPlatform/google-fluentd/releases) 
 
 ```sh
-# Cloud Monitoring agent
-curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
-sudo bash add-monitoring-agent-repo.sh
+# Cloud testtoring agent
+curl -sSO https://dl.google.com/cloudagents/add-testtoring-agent-repo.sh
+sudo bash add-testtoring-agent-repo.sh
 sudo apt-get update
 sudo apt-get install stackdriver-agent
 
@@ -710,8 +1182,8 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
 - What is the foundational process at the base of Google's Site Reliability Engineering (SRE) ?
     - Capacity planning
     - Testing and release procedures
-    - **Monitoring**
-        - Before you can take any of the other actions, you must first be monitoring the system.
+    - **testtoring**
+        - Before you can take any of the other actions, you must first be testtoring the system.
     - Root cause analysis
 - What is the purpose of the Stackdriver Trace service?
     - **Reporting on latency as part of managing performance**
@@ -719,12 +1191,12 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
     - Reporting on GCP system errors
     - Reporting on application errors
     - Reporting on GCP resource consumption as part of managing performance
-- Stackdriver integrates several technologies, including monitoring, logging, error reporting, and debugging, that are commonly implemented in other environments as separate solutions using separate products. What are key benefits of integration of these services?
+- Stackdriver integrates several technologies, including testtoring, logging, error reporting, and debugging, that are commonly implemented in other environments as separate solutions using separate products. What are key benefits of integration of these services?
     - **Reduces overhead, reduces noise, streamlines use, and fixes problems faster**
         - Stackdriver integration streamlines and unifies these traditionally independent services, making it much easier to establish procedures around them and to use them in continuous ways.
     - Ability to replace one tool with another from a different vendor
     - Detailed control over the connections between the technologies
-    - Better for GCP only so long as you don't need to monitor other applications or clouds
+    - Better for GCP only so long as you don't need to testtor other applications or clouds
 - What is the purpose of virtual private networking (VPN)?
     - It is a method to detect intruders at the edge of a network boundary.
     - VPNs are also called access control lists, or ACLs, and they limit network access.
@@ -797,7 +1269,7 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
     - Implements user-defined encryptions with user supplied keys.
     - **Pass key:value pairs to the VM, including a literal script or a reference to a script file.**
         - Passes key:value pairs.
-    - Change which information for a VM is monitored by Stackdriver.
+    - Change which information for a VM is testtored by Stackdriver.
 - What kinds of files form the Deployment Manager templates?
     - Templates are composed of *.yaml, java, and Node.js files.
     - **Templates are composed of *.yaml, python, and jinja2 files.**
@@ -833,7 +1305,7 @@ gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zi
         - Fast to start a cluster.
     - Dataproc allows full control over HDFS advanced settings.
     - Dataproc billing occurs in 10-hour intervals.
-    - It doesn't integrate with Stackdriver, but it has its own monitoring system.
+    - It doesn't integrate with Stackdriver, but it has its own testtoring system.
 - What is Cloud Pub/Sub?
     - A feature of Google Maps that identifies bars and sandwich restaurants.
     - A feature of Google console that allows you to subscribe to Cloud news feeds.
