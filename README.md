@@ -52,6 +52,8 @@
 # devops
 - [ci-cd](./devops/ci-cd.md)
 - [devops](./devops/devops.md)
+- [grafana](./devops/grafana.md)
+- [skywalking](./devops/skywalking.md)
 - [sre](./devops/sre.md)
 # gcp
 - [gcp](./gcp/gcp.md)
