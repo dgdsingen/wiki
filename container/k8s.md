@@ -732,7 +732,7 @@ kubectl delete pod --field-selector=status.phase==Succeeded
 
 **Pod의 draining time** 
 
-Pod가 바로 종료되어 버리면 Pod에 남아있던 트랜젝션이 그냥 끊어져서 문제가 될 수 있다. 그래서 AWS LB도 기본 60초 draining time이 있다.
+Pod가 바로 종료되어 버리면 Pod에 남아있던 트랜젝션이 그냥 끊어져서 문제가 될 수 있다. 그래서 AWS LB도 기본 300초 draining time이 있다.
 
 Pod에는 terminationGracePeriodSeconds 옵션이 있다. (기본값 30초)
 
