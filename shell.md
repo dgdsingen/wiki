@@ -502,13 +502,13 @@ egrep에서 지원하는 확장 메타문자
     
     - '[a-z]+ove' : 1개 이상의 소문자 뒤에 ove가 붙어있는 문자열과 대응. move,approve,love,behoove 등이 해당된다.
 - ? : 선행문자와 같은 문자의0개 혹은 1개와 대응
-    
+  
     - 'lo?ve' : l 다음에 0개의 문자 혹은 하나의 문자가 o가 나오는 문자열과 대응. love,lve 등이 해당된다.
 - a|b : a 혹은 b와 대응
-    
+  
     - 'love|hate' : love 혹은 hate와 대응.'
 - () : 정규표현식을 묶어준다
-    
+  
     - 'love(able|ly)' : lovable 혹은 lovely와 대응.
 - '(ov)+' : ov가 한 번 이상 등장하는 문자열과 일치.
 
