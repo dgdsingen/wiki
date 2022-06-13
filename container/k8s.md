@@ -695,6 +695,8 @@ Thanos를 Sidecar로 붙혀서 Prometheus HA 구성을 한다. kube-prometheus-s
 > https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/thanos.md
 >
 > https://github.com/thanos-io/thanos/blob/main/docs/storage.md
+>
+> https://www.infracloud.io/blogs/thanos-ha-scalable-prometheus/
 
 
 
