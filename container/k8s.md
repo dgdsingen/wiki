@@ -481,7 +481,7 @@ Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 
 
 
 
-## K8s + Prometheus + Grafana
+## Prometheus + Grafana
 
 우선 k8s에 prometheus부터 배포한다.
 
@@ -683,6 +683,18 @@ git clone https://github.com/prometheus-community/helm-charts.git
 ```
 
 이후 grafana에서 datasource는 그대로 prometheus로 두고, mysql dashboard만 추가해보면 mysql server metric이 잘 보이는 것을 확인할 수 있다.
+
+
+
+## Thanos + Prometheus + Grafana
+
+Thanos를 Sidecar로 붙혀서 Prometheus HA 구성을 한다. kube-prometheus-stack에서 해당 구성을 통으로 제공한다.
+
+> https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+>
+> https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/thanos.md
+>
+> https://github.com/thanos-io/thanos/blob/main/docs/storage.md
 
 
 
