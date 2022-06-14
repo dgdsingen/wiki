@@ -28,6 +28,15 @@ Heap:MetaSpace 비율은 4:1 정도로 설정하지만 이는 애플리케이션
 JAVA_OPTS="-Xms8192m -Xmx8192m -XX:MetaspaceSize=2048m -XX:MaxMetaspaceSize=2048m"
 ```
 
+java 8 update 191 이상에서는 아래 옵션을 사용할 수 있다. host의 Memory가 1G인 경우 JVM은 0.5G를 사용한다.
+
+```sh
+-XX:InitialRAMPercentage=50.0
+-XX:MaxRAMPercentage=50.0
+```
+
+
+
 ## Heap Analyze
 
 ### Dump
