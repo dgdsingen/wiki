@@ -756,6 +756,18 @@ Pod에는 terminationGracePeriodSeconds 옵션이 있다. (기본값 30초)
 
 
 
+**Pod file 복사** 
+
+```sh
+# host => pod
+kubectl cp dir/file podname:dir/file
+
+# pod => host(절대경로)
+kubectl cp (namespace) podname:dir/file /dir/file
+```
+
+
+
 # CKA (Certified Kubernetes Administrator)
 
 > https://kubernetes.io/ko/training/

@@ -28,6 +28,17 @@ Heap:MetaSpace 비율은 4:1 정도로 설정하지만 이는 애플리케이션
 JAVA_OPTS="-Xms8192m -Xmx8192m -XX:MetaspaceSize=2048m -XX:MaxMetaspaceSize=2048m"
 ```
 
+## Heap Dump
+
+```sh
+# process number 확인
+jps
+78 app.jar
+
+# generate heap dump
+jmap -dump:format=b,file=heapdump.hprof 78
+```
+
 
 
 # Spring
