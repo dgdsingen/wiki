@@ -483,6 +483,8 @@ Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 
 
 ## Prometheus + Grafana
 
+> https://www.robustperception.io/how-much-ram-does-prometheus-2-x-need-for-cardinality-and-ingestion/ : 시계열 데이터로 Prometheus 메모리 사용량 계산하기
+
 우선 k8s에 prometheus부터 배포한다.
 
 > https://github.com/prometheus-community/helm-charts
