@@ -28,15 +28,29 @@ Heap:MetaSpace 비율은 4:1 정도로 설정하지만 이는 애플리케이션
 JAVA_OPTS="-Xms8192m -Xmx8192m -XX:MetaspaceSize=2048m -XX:MaxMetaspaceSize=2048m"
 ```
 
-## Heap Dump
+## Heap Analyze
+
+### Dump
 
 ```sh
 # process number 확인
 jps
-78 app.jar
+7 app.jar
 
 # generate heap dump
-jmap -dump:format=b,file=heapdump.hprof 78
+jmap -dump:format=b,file=heapdump.hprof 7
+```
+
+### jstat
+
+```sh
+# process number 확인
+jps
+7 app.jar
+
+# 5초마다 head 20라인으로 gc 상태 체크
+jstat -gc -h20 7 5000
+jstat -gcutil -h20 7 5000
 ```
 
 
