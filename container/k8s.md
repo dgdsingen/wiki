@@ -485,6 +485,8 @@ Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 
 
 > https://www.robustperception.io/how-much-ram-does-prometheus-2-x-need-for-cardinality-and-ingestion/ : 시계열 데이터로 Prometheus 메모리 사용량 계산하기
 
+
+
 우선 k8s에 prometheus부터 배포한다.
 
 > https://github.com/prometheus-community/helm-charts
@@ -685,6 +687,15 @@ git clone https://github.com/prometheus-community/helm-charts.git
 ```
 
 이후 grafana에서 datasource는 그대로 prometheus로 두고, mysql dashboard만 추가해보면 mysql server metric이 잘 보이는 것을 확인할 수 있다.
+
+
+
+### PromQL
+
+```sql
+# pod 메모리 사용량 조회시 container_name이 "POD"이거나 ""(없는) 경우가 포함되어 메모리량이 튀는 경우가 있는데 이런 케이스를 제거한다.
+sum(container_memory_usage_bytes{pod="$pod",container!~"POD|"})
+```
 
 
 
