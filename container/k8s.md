@@ -694,7 +694,9 @@ git clone https://github.com/prometheus-community/helm-charts.git
 
 ```sql
 # pod 메모리 사용량 조회시 container_name이 "POD"이거나 ""(없는) 경우가 포함되어 메모리량이 튀는 경우가 있는데 이런 케이스를 제거한다.
-sum(container_memory_usage_bytes{pod="$pod",container!~"POD|"})
+# 또한 container_memory_usage_bytes 로 메모리를 조회하는 경우 언제든 kernel에 의해 해제될 수 있는 캐시까지도 포함한 값이므로 뻥튀기될 수 있다.
+# 그러므로 OOM Killer가 바라보는 실제 메모리 사용량을 측정하기 위해서는 container_memory_working_set_bytes 를 사용하자.
+sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 ```
 
 
