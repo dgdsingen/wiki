@@ -17,3 +17,12 @@ mysql -u username -p < testtable.txt
 mysql -u username -p –database=testdb < testtable.txt
 ```
 
+
+
+# Issues
+
+```sql
+# 의도적으로 slow query 만들기
+select 'a' where sleep(5)=0;
+```
+
