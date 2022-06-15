@@ -18,8 +18,6 @@
 
 
 
-- Pod에서 Service는 `{service-name}.{namespace}.svc.cluster.local` 로 접근 가능하다.
-
 # Distribution
 
 ## Minikube
@@ -399,6 +397,32 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
+
+
+# Service
+
+- Pod에서 Service는 `{service-name}.{namespace}.svc.cluster.local` 로 접근 가능하다.
+
+
+
+# Deployment
+
+> https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment/
+
+```yaml
+# rolling update 시 pod 생성/삭제 비율 설정
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # 업데이트하는 동안 항상 실행하는 총 pod 수를 최대 의도한 pod 수의 125%가 되도록 보장(기본 올림 계산)한다. pod 4개짜리 deploy를 restart 하는 경우 125%에 맞추어 기존/새 pod의 전체 갯수는 5개를 넘지 않게 된다.
+      maxSurge: 25%
+      # 업데이트 중에 항상 사용 가능한 전체 pod 수를 의도한 pod 수의 75% 이상이 되도록 보장(기본 내림 계산)한다. 예를 들어 pod 4개짜리 deploy를 restart 하는 경우 25%인 1개 pod가 terminate 된다. 이후 새로운 pod가 생성되면 그에 따라 다시 25% 비율 계산해서 pod를 terminate 시킨다.
+      maxUnavailable: 25%
 ```
 
 
