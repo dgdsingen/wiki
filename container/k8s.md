@@ -575,6 +575,121 @@ grafana에 접속해 Datasource로 Prometheus를 등록한다. Domain/IP는 위�
 
 
 
+운영 환경에 Prometheus 배포시에는 CPU, Memory, Storage Size, Retention Time/Size 를 수정해야할 수 있다.
+
+CPU는 벤치마킹 결과를 보니 1 Core로 초당 최대 100k metric 처리 가능하다고 하며
+
+Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data 등을 고려해서 넉넉하게 잡아준다.
+
+그리고 Retention Time은 기본 15d, Size는 0(무제한)으로 되어 있는데 Size를 Storage의 1/4 정도로 잡아줘보자. (Compation + Index data + Retention 주기 사이에 늘어날 용량 고려)
+
+또한 scrape_interval도 기본 1m 으로 되어 있는데 metric 변화량을 더 자세히 보고 싶다면 더 작게 조정한다.
+
+`helm-charts/charts/prometheus/values.yaml` 을 아래와 같이 변경한다. 
+
+```diff
+     ## alertmanager data Persistent Volume size
+     ##
+-    size: 2Gi
++    size: 10Gi
+
+   ## alertmanager resource requests and limits
+   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+   ##
+-  resources: {}
+-    # limits:
+-    #   cpu: 10m
+-    #   memory: 32Mi
+-    # requests:
+-    #   cpu: 10m
+-    #   memory: 32Mi
++  resources: 
++    limits:
++      cpu: 500m
++      memory: 256Mi
++    requests:
++      cpu: 500m
++      memory: 256Mi
+ 
+   ## node-exporter resource limits & requests
+   ## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
+   ##
+-  resources: {}
+-    # limits:
+-    #   cpu: 200m
+-    #   memory: 50Mi
+-    # requests:
+-    #   cpu: 100m
+-    #   memory: 30Mi
++  resources: 
++    limits:
++      cpu: 500m
++      memory: 256Mi
++    requests:
++      cpu: 500m
++      memory: 256Mi
+
+   global:
+     ## How frequently to scrape targets by default
+     ##
+-    scrape_interval: 1m
++    scrape_interval: 15s 
+
+   ## Additional Prometheus server container arguments
+   ##
+-  extraArgs: {}
++  extraArgs:
++    'storage.tsdb.retention.size': "10GB"
+ 
+     ## Prometheus server data Persistent Volume size
+     ##
+-    size: 8Gi
++    size: 40Gi
+
+   ## Prometheus server resource requests and limits
+   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+   ##
+-  resources: {}
+-    # limits:
+-    #   cpu: 500m
+-    #   memory: 512Mi
+-    # requests:
+-    #   cpu: 500m
+-    #   memory: 512Mi
++  resources: 
++    limits:
++      cpu: 1000m
++      memory: 4Gi 
++    requests:
++      cpu: 1000m
++      memory: 4Gi 
+
+   ## pushgateway resource requests and limits
+   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+   ##
+-  resources: {}
+-    # limits:
+-    #   cpu: 10m
+-    #   memory: 32Mi
+-    # requests:
+-    #   cpu: 10m
+-    #   memory: 32Mi
++  resources: 
++    limits:
++      cpu: 500m
++      memory: 256Mi
++    requests:
++      cpu: 500m
++      memory: 256Mi
+ 
+     ## pushgateway data Persistent Volume size
+     ##
+-    size: 2Gi
++    size: 10Gi
+```
+
+
+
 ### grafana(2) + mysql 로 HA 구성
 
 ```sh
