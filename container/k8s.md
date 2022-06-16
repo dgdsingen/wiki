@@ -407,9 +407,15 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 
 
+# Pod
+
+> https://kubernetes.io/ko/docs/concepts/workloads/pods/pod-lifecycle/
+
+
+
 # Deployment
 
-> https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment/
+> https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment
 
 ```yaml
 # rolling update 시 pod 생성/삭제 비율 설정
@@ -423,6 +429,27 @@ spec:
       maxSurge: 25%
       # 업데이트 중에 항상 사용 가능한 전체 pod 수를 의도한 pod 수의 75% 이상이 되도록 보장(기본 내림 계산)한다. 예를 들어 pod 4개짜리 deploy를 restart 하는 경우 25%인 1개 pod가 terminate 된다. 이후 새로운 pod가 생성되면 그에 따라 다시 25% 비율 계산해서 pod를 terminate 시킨다.
       maxUnavailable: 25%
+  template:
+    spec:
+      containers:
+        # container 동작 여부 판단
+        livenessProbe:
+          initialDelaySeconds: 5 # 최소값 0, 기본값 0
+          periodSeconds: 15 # 최소값 1, 기본값 10
+          timeoutSeconds: 10 # 최소값 1, 기본값 1
+          successThreshold: 1 # 최소값 1, 기본값 1
+          failureThreshold: 10 # 최소값 1, 기본값 3
+          httpGet:
+            path: /healthcheck
+            port: 8080
+            scheme: HTTP # HTTP or HTTPS, 기본값 HTTP
+        # container가 요청을 받을 수 있게 되었는지 판단. container가 동작은 하더라도 아직 port가 준비되지 않았을 수 있다.
+        # spring boot application의 경우 actuator를 추가하면 /actuator/health/liveness, /actuator/health/readiness 가 제공된다.
+        readinessProbe:
+          initialDelaySeconds: 5
+        # container 내 application이 시작되었는지 판단. port가 준비되었더라도 application 초기화가 아직 안되었을 수 있다.
+        startupProbe:
+          initialDelaySeconds: 5
 ```
 
 
