@@ -545,6 +545,10 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
         - Legend: `outbound` 
         - Unit: `bytes(SI)` 
 
+#### k8s pod 비정상 종료
+
+- Query: `count by(container, reason) (kube_pod_container_status_terminated_reason{reason!="Completed"})` 
+
 
 
 ## Datasource: Google Cloud Monitoring
