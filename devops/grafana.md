@@ -13,7 +13,29 @@
 - Name: node
 - Type: Query
 - Data source: Prometheus
-- Query: label_values(node_uname_info,nodename)
+- Query: `label_values(node_uname_info,nodename)` 
+
+## MySQL Overview Dashboard 설정
+
+- Name: name
+- Type: Query
+- Data source: Prometheus
+- Query: `label_values(mysql_up, app_kubernetes_io_instance)` 
+
+
+
+- Name: name
+- Type: Query
+- Data source: Prometheus
+- Query: `label_values(mysql_up{app_kubernetes_io_instance ="$name"}, instance)` 
+
+
+
+이렇게 설정하면 `name` 을 고를 때마다 그에 해당하는 `instance` 를 Query 해와서 매핑해준다.
+
+이렇게 하는 이유는 `instance` 값이 Query에 사용되기 때문에 반드시 필요한 값이긴 하나 IP:PORT 로만 된 값이라서 사람이 보고 판단하기 어렵기 때문이다.
+
+사람이 보고 판단 가능한 `name` 값을 먼저 가져온 뒤, 그에 해당하는 `instance` 값도 불러와서 사람과 Query 양쪽에서 모두 사용 가능하도록 변수를 매핑해준다.
 
 
 
@@ -22,7 +44,7 @@
 ### Node 별 CPU 점유율
 
 - Data source: Prometheus
-- Query: `sum by(instance) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[5m]))` 
+- Query: `sum by(node) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[5m]))` 
 
 ### Node 별 Memory 점유율
 
@@ -33,3 +55,22 @@
 
 - Data source: Prometheus
 - Query: `sum(node_filesystem_size_bytes{node="$node"} - node_filesystem_avail_bytes{node="$node"}) by (node) / sum(node_filesystem_size_bytes{node="$node"}) by(node)` 
+
+### Pod 별 리소스 제한
+
+- Data source: Prometheus
+- Query:
+    - `kube_pod_container_resource_limits{pod="$pod", resource="cpu"}` 
+    - `kube_pod_container_resource_limits{pod="$pod", resource="memory"}` 
+
+
+
+# Issues
+
+```sql
+# pod 메모리 사용량 조회시 container_name이 "POD"이거나 ""(없는) 경우가 포함되어 메모리량이 튀는 경우가 있는데 이런 케이스를 제거한다.
+# 또한 container_memory_usage_bytes 로 메모리를 조회하는 경우 언제든 kernel에 의해 해제될 수 있는 캐시까지도 포함한 값이므로 뻥튀기될 수 있다.
+# 그러므로 OOM Killer가 바라보는 실제 메모리 사용량을 측정하기 위해서는 container_memory_working_set_bytes 를 사용하자.
+sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
+```
+

@@ -545,9 +545,12 @@ Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 
 > https://github.com/kubernetes/kube-state-metrics/blob/master/docs/pod-metrics.md
 
 ```sh
+git clone https://github.com/prometheus-community/helm-charts.git prometheus
+
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install prometheus prometheus-community/prometheus
+
+helm install prometheus prometheus
 ```
 
 이후 아래와 같은 service가 생성된다. 이 중 prometheus-server를 LB, DNS에 등록하여 접속 잘 되면 prometheus는 준비되었다.
@@ -697,8 +700,11 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 ### grafana(2) + mysql 로 HA 구성
 
 ```sh
+git clone https://github.com/grafana/helm-charts.git grafana
+
 helm repo add grafana https://grafana.github.io/helm-charts
-git clone https://github.com/grafana/helm-charts.git
+
+helm install grafana grafana
 ```
 
 `helm-charts/charts/grafana/values.yaml` 을 아래와 같이 변경한다. Service type을 LoadBalancer로 사용하는 경우 minikube에서는 metallb 설정을 먼저 해준다.
@@ -842,10 +848,10 @@ git clone https://github.com/prometheus-community/helm-charts.git
 `helm-charts/charts/prometheus-mysql-exporter/values.yaml` 을 아래와 같이 변경한다.
 
 ```diff
- mysql:
+mysql:
 -  db: ""
 -  host: "localhost"
-+  db: "mysql"
++  db: "grafana"
 +  host: "mysql"
    param: ""
 -  pass: "password"
@@ -857,17 +863,6 @@ git clone https://github.com/prometheus-community/helm-charts.git
 ```
 
 이후 grafana에서 datasource는 그대로 prometheus로 두고, mysql dashboard만 추가해보면 mysql server metric이 잘 보이는 것을 확인할 수 있다.
-
-
-
-### PromQL
-
-```sql
-# pod 메모리 사용량 조회시 container_name이 "POD"이거나 ""(없는) 경우가 포함되어 메모리량이 튀는 경우가 있는데 이런 케이스를 제거한다.
-# 또한 container_memory_usage_bytes 로 메모리를 조회하는 경우 언제든 kernel에 의해 해제될 수 있는 캐시까지도 포함한 값이므로 뻥튀기될 수 있다.
-# 그러므로 OOM Killer가 바라보는 실제 메모리 사용량을 측정하기 위해서는 container_memory_working_set_bytes 를 사용하자.
-sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
-```
 
 
 
