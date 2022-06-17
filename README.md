@@ -6,6 +6,7 @@
 - [cache](./cache.md)
 - [chrome](./chrome.md)
 - [deep-learning](./deep-learning.md)
+- [firefox](./firefox.md)
 - [format](./format.md)
 - [git](./git.md)
 - [hyperledger-fabric](./hyperledger-fabric.md)
@@ -52,9 +53,10 @@
 # devops
 - [ci-cd](./devops/ci-cd.md)
 - [devops](./devops/devops.md)
-- [grafana](./devops/grafana.md)
+- [prometheus](./devops/prometheus.md)
 - [skywalking](./devops/skywalking.md)
 - [sre](./devops/sre.md)
+- [zuul](./devops/zuul.md)
 # gcp
 - [gcp](./gcp/gcp.md)
 - [professional-cloud-architect](./gcp/professional-cloud-architect.md)
