@@ -15,6 +15,18 @@
 - Data source: Prometheus
 - Query: `label_values(node_uname_info,nodename)` 
 
+
+
+### List Pods
+
+- Name: pod
+- Type: Query
+- Data source: Prometheus
+- Query: `label_values(kube_pod_info{namespace="$namespace"},  pod)` 
+- 이렇게 설정했을 때 이미 종료된 Pod들이 보이는 경우가 있다. 이 때는 Refresh: On time range change 로 변경해주자. 이제 time range를 변경하면 그 안에 존재하는 metric으로부터 variable을 매핑해오므로 이미 종료되어 시간이 지난 것들은 나오지 않게 된다.
+
+
+
 ## MySQL Overview Dashboard 설정
 
 - Name: name
@@ -56,12 +68,17 @@
 - Data source: Prometheus
 - Query: `sum(node_filesystem_size_bytes{node="$node"} - node_filesystem_avail_bytes{node="$node"}) by (node) / sum(node_filesystem_size_bytes{node="$node"}) by(node)` 
 
-### Pod 별 리소스 제한
+### Pod 별 리소스 제한값
 
 - Data source: Prometheus
 - Query:
     - `kube_pod_container_resource_limits{pod="$pod", resource="cpu"}` 
     - `kube_pod_container_resource_limits{pod="$pod", resource="memory"}` 
+
+### Pod 가동 상태
+
+- Data source: Prometheus
+- Query:`sum(kube_pod_container_status_waiting{pod="$pod", reason!~"ContainerCreating"})` 
 
 
 
