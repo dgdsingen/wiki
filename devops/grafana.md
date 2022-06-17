@@ -12,14 +12,12 @@
 
 - Name: node
 - Type: Query
-- Data source: Prometheus
 - Query: `label_values(node_uname_info,nodename)` 
 
 ### k8s instances
 
 - Name: node
 - Type: Query
-- Data source: Prometheus
 - Query: `query_result(node_uname_info{node="$node"})` 
 - Regex: `/instance="(.+?)"/` 
 
@@ -27,7 +25,6 @@
 
 - Name: pod
 - Type: Query
-- Data source: Prometheus
 - Query: `label_values(kube_pod_info{namespace="$namespace"},  pod)` 
 - 이렇게 설정했을 때 이미 종료된 Pod들이 보이는 경우가 있다. 이 때는 Refresh: On time range change 로 변경해주자. 이제 time range를 변경하면 그 안에 존재하는 metric으로부터 variable을 매핑해오므로 이미 종료되어 시간이 지난 것들은 나오지 않게 된다.
 
@@ -37,14 +34,12 @@
 
 - Name: name
 - Type: Query
-- Data source: Prometheus
 - Query: `label_values(mysql_up, app_kubernetes_io_instance)` 
 
 
 
 - Name: name
 - Type: Query
-- Data source: Prometheus
 - Query: `label_values(mysql_up{app_kubernetes_io_instance ="$name"}, instance)` 
 
 
@@ -59,19 +54,38 @@
 
 ## Query
 
+### k8s master 정상 가동률
+
+- Query: `avg(avg_over_time((sum without ()(kube_pod_container_status_ready{namespace="kube-system",pod=~".*.dashboard.*|.*.dns.*|kube.*|.*.calico.*|.*.flannel.*|.*.etcd.*"}) / count without ()(kube_pod_container_status_ready{namespace="kube-system",pod=~".*.dashboard.*|.*.dns.*|kube.*|.*.calico.*|.*.flannel.*|.*.etcd.*"}))[$duration:5m]))` 
+
+### k8s namespace 대수
+
+- Query: ` count(kube_namespace_created)` 
+
+### k8s node 대수
+
+- Query: `count(kube_node_info)` 
+
+### k8s pod 대수
+
+- Query: ` count(count by (pod)(container_spec_memory_reservation_limit_bytes{pod!=""}))` 
+
+### k8s pvc 대수
+
+- Query: `count(kube_persistentvolumeclaim_info) ` 
+
+
+
 ### k8s node 별 CPU 사용률
 
-- Data source: Prometheus
 - Query: `(avg by (node,nodename) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait"}[$duration])) + on(node) group_left(nodename) node_uname_info) - 1` 
 
 ### k8s node 별 Memory 사용량
 
-- Data source: Prometheus
 - Query: `((node_memory_MemTotal_bytes  + on(instance) group_left(nodename) node_uname_info) - (node_memory_MemAvailable_bytes  + on(instance) group_left(nodename) node_uname_info))` 
 
 ### k8s 초당 네트워크 트래픽
 
-- Data source: Prometheus
 - Query: 
     - `sum(rate(node_network_receive_bytes_total[$duration]))` 
         - Legend: `inbound` 
@@ -82,51 +96,42 @@
 
 ### k8s API 서버 호출
 
-- Data source: Prometheus
 - Query: `sum by (verb) (rate(apiserver_request_total[$duration]))` 
 
 
 
 ### k8s node CPU 사용률
 
-- Data source: Prometheus
 - Query: `avg by(node) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[$duration]))` 
 
 ### k8s node Memory 사용률
 
-- Data source: Prometheus
 - Query: `sum(node_memory_MemTotal_bytes{node="$node"} - node_memory_MemAvailable_bytes{node="$node"}) by (node) / sum(node_memory_MemTotal_bytes{node="$node"}) by(node)` 
 
 ### k8s node Disk 사용률
 
-- Data source: Prometheus
 - Query: `sum(node_filesystem_size_bytes{node="$node"} - node_filesystem_avail_bytes{node="$node"}) by (node) / sum(node_filesystem_size_bytes{node="$node"}) by (node)` 
 
 ### k8s node CPU Core
 
-- Data source: Prometheus
 - Query: `machine_cpu_cores{kubernetes_io_hostname="$node"}` 
 
 ### k8s node Memory
 
-- Data source: Prometheus
 - Query: `machine_memory_bytes{instance="$node"}` 
 
 
 
 ### k8s pod Age
 
-- Data source: Prometheus
 - Query: `time()-kube_pod_start_time{pod="$pod"}` 
 
 ### k8s pod 가동 상태
 
-- Data source: Prometheus
 - Query: `sum(kube_pod_container_status_waiting{pod="$pod", reason!~"ContainerCreating"})` 
 
 ### k8s pod 리소스 사용량
 
-- Data source: Prometheus
 - Query: 
     - `sum(rate(container_cpu_usage_seconds_total{pod="$pod"}[$duration]))` 
         - Legend: `CPU(%)` 
@@ -137,19 +142,16 @@
 
 ### k8s pod 리소스 할당 제한값
 
-- Data source: Prometheus
 - Query:
     - `kube_pod_container_resource_limits{pod="$pod", resource="cpu"}` 
     - `kube_pod_container_resource_limits{pod="$pod", resource="memory"}` 
 
 ### k8s pod N분 이내 재시작
 
-- Data source: Prometheus
 - Query: `sum(round(increase(kube_pod_container_status_restarts_total{pod="$pod"}[$duration])))` 
 
 ### k8s pod 초당 네트워크 트래픽
 
-- Data source: Prometheus
 - Query: 
     - `sum(rate(container_network_receive_bytes_total{pod="$pod"}[$duration]))` 
         - Legend: `inbound` 
