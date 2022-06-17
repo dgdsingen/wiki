@@ -17,6 +17,16 @@
 
 
 
+### List instances
+
+- Name: node
+- Type: Query
+- Data source: Prometheus
+- Query: `query_result(node_uname_info{node="$node"})` 
+- Regex: `/instance="(.+?)"/` 
+
+
+
 ### List Pods
 
 - Name: pod
