@@ -605,11 +605,11 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 -    #   memory: 32Mi
 +  resources: 
 +    limits:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
 +    requests:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
  
    ## node-exporter resource limits & requests
    ## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
@@ -623,11 +623,11 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 -    #   memory: 30Mi
 +  resources: 
 +    limits:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
 +    requests:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
 
    global:
      ## How frequently to scrape targets by default
@@ -639,12 +639,12 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
    ##
 -  extraArgs: {}
 +  extraArgs:
-+    'storage.tsdb.retention.size': "10GB"
++    'storage.tsdb.retention.size': "25GB"
  
      ## Prometheus server data Persistent Volume size
      ##
 -    size: 8Gi
-+    size: 40Gi
++    size: 100Gi
 
    ## Prometheus server resource requests and limits
    ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -656,13 +656,13 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 -    # requests:
 -    #   cpu: 500m
 -    #   memory: 512Mi
-+  resources: 
++  resources:
 +    limits:
 +      cpu: 1000m
-+      memory: 4Gi 
++      memory: 8Gi
 +    requests:
 +      cpu: 1000m
-+      memory: 4Gi 
++      memory: 8Gi
 
    ## pushgateway resource requests and limits
    ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -676,17 +676,21 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 -    #   memory: 32Mi
 +  resources: 
 +    limits:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
 +    requests:
-+      cpu: 500m
-+      memory: 256Mi
++      cpu: 200m
++      memory: 128Mi
  
      ## pushgateway data Persistent Volume size
      ##
 -    size: 2Gi
 +    size: 10Gi
 ```
+
+
+
+이후 `helm upgrade prometheus prometheus` 시 `level=error ts=2021-10-31T17:26:25.884Z caller=main.go:917 err="opening storage failed: lock DB directory: resource temporarily unavailable"` 와 같은 에러가 발생할 수 있다. 이 때는 `kubectl scale deployment prometheus-server --replicas=0` 로 기존 pod를 종료시킨 뒤에 `kubectl scale deployment prometheus-server --replicas=1` 로 다시 pod를 되살려준다.
 
 
 
