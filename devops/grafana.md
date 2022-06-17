@@ -4,20 +4,18 @@
 
 
 
-# K8s
+# Prometheus
 
 ## Variables
 
-### List nodes
+### k8s nodes
 
 - Name: node
 - Type: Query
 - Data source: Prometheus
 - Query: `label_values(node_uname_info,nodename)` 
 
-
-
-### List instances
+### k8s instances
 
 - Name: node
 - Type: Query
@@ -25,9 +23,7 @@
 - Query: `query_result(node_uname_info{node="$node"})` 
 - Regex: `/instance="(.+?)"/` 
 
-
-
-### List Pods
+### k8s pods
 
 - Name: pod
 - Type: Query
@@ -37,7 +33,7 @@
 
 
 
-## MySQL Overview Dashboard 설정
+### MySQL Overview Dashboard 설정
 
 - Name: name
 - Type: Query
@@ -63,32 +59,104 @@
 
 ## Query
 
-### Node 별 CPU 점유율
+### k8s node 별 CPU 사용률
 
 - Data source: Prometheus
-- Query: `sum by(node) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[5m]))` 
+- Query: `(avg by (node,nodename) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait"}[$duration])) + on(node) group_left(nodename) node_uname_info) - 1` 
 
-### Node 별 Memory 점유율
+### k8s node 별 Memory 사용량
+
+- Data source: Prometheus
+- Query: `((node_memory_MemTotal_bytes  + on(instance) group_left(nodename) node_uname_info) - (node_memory_MemAvailable_bytes  + on(instance) group_left(nodename) node_uname_info))` 
+
+### k8s 초당 네트워크 트래픽
+
+- Data source: Prometheus
+- Query: 
+    - `sum(rate(node_network_receive_bytes_total[$duration]))` 
+        - Legend: `inbound` 
+        - Unit: `bytes(SI)` 
+    - `sum(rate(node_network_transmit_bytes_total[$duration]))` 
+        - Legend: `outbound` 
+        - Unit: `bytes(SI)` 
+
+### k8s API 서버 호출
+
+- Data source: Prometheus
+- Query: `sum by (verb) (rate(apiserver_request_total[$duration]))` 
+
+
+
+### k8s node CPU 사용률
+
+- Data source: Prometheus
+- Query: `avg by(node) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[$duration]))` 
+
+### k8s node Memory 사용률
 
 - Data source: Prometheus
 - Query: `sum(node_memory_MemTotal_bytes{node="$node"} - node_memory_MemAvailable_bytes{node="$node"}) by (node) / sum(node_memory_MemTotal_bytes{node="$node"}) by(node)` 
 
-### Node 별 Disk 사용율
+### k8s node Disk 사용률
 
 - Data source: Prometheus
-- Query: `sum(node_filesystem_size_bytes{node="$node"} - node_filesystem_avail_bytes{node="$node"}) by (node) / sum(node_filesystem_size_bytes{node="$node"}) by(node)` 
+- Query: `sum(node_filesystem_size_bytes{node="$node"} - node_filesystem_avail_bytes{node="$node"}) by (node) / sum(node_filesystem_size_bytes{node="$node"}) by (node)` 
 
-### Pod 별 리소스 제한값
+### k8s node CPU Core
+
+- Data source: Prometheus
+- Query: `machine_cpu_cores{kubernetes_io_hostname="$node"}` 
+
+### k8s node Memory
+
+- Data source: Prometheus
+- Query: `machine_memory_bytes{instance="$node"}` 
+
+
+
+### k8s pod Age
+
+- Data source: Prometheus
+- Query: `time()-kube_pod_start_time{pod="$pod"}` 
+
+### k8s pod 가동 상태
+
+- Data source: Prometheus
+- Query: `sum(kube_pod_container_status_waiting{pod="$pod", reason!~"ContainerCreating"})` 
+
+### k8s pod 리소스 사용량
+
+- Data source: Prometheus
+- Query: 
+    - `sum(rate(container_cpu_usage_seconds_total{pod="$pod"}[$duration]))` 
+        - Legend: `CPU(%)` 
+    - `sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})`
+        - Legend: `Memory(bytes)` 
+    - `sum(container_fs_usage_bytes{pod="$pod"})` 
+        - Legend: `File system usage` 
+
+### k8s pod 리소스 할당 제한값
 
 - Data source: Prometheus
 - Query:
     - `kube_pod_container_resource_limits{pod="$pod", resource="cpu"}` 
     - `kube_pod_container_resource_limits{pod="$pod", resource="memory"}` 
 
-### Pod 가동 상태
+### k8s pod N분 이내 재시작
 
 - Data source: Prometheus
-- Query:`sum(kube_pod_container_status_waiting{pod="$pod", reason!~"ContainerCreating"})` 
+- Query: `sum(round(increase(kube_pod_container_status_restarts_total{pod="$pod"}[$duration])))` 
+
+### k8s pod 초당 네트워크 트래픽
+
+- Data source: Prometheus
+- Query: 
+    - `sum(rate(container_network_receive_bytes_total{pod="$pod"}[$duration]))` 
+        - Legend: `inbound` 
+        - Unit: `bytes(SI)` 
+    - `sum(rate(container_network_transmit_bytes_total{pod="$pod"}[$duration]))` 
+        - Legend: `outbound` 
+        - Unit: `bytes(SI)` 
 
 
 
