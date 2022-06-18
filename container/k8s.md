@@ -523,6 +523,26 @@ standard-rwo         pd.csi.storage.gke.io   Delete          WaitForFirstConsume
 
 
 
+이후 아래와 같이 crontab을 걸어줘도 되겠다.
+
+`crontab` 
+
+```sh
+00 05 * * * /home/test/snapshot/backup.sh 2>&1 > /home/test/snapshot/backup.log
+```
+
+`backup.sh` 
+
+```sh
+#!/bin/bash
+
+/snap/bin/kubectl delete -f /home/test/snapshot/volumesnapshot.yml || true # delete할 object가 없어서 커맨드가 실패해도 다음 라인 실행되도록 || true 추가
+sleep 10
+/snap/bin/kubectl apply -f /home/test/snapshot/volumesnapshot.yml
+```
+
+
+
 # Tools
 
 > [helm](https://helm.sh/) : package manager
