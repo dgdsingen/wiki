@@ -106,6 +106,16 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 -    scrape_interval: 1m
 +    scrape_interval: 15s 
 
+     ## Prometheus server data Persistent Volume Storage Class
+     ## If defined, storageClassName: <storageClass>                                                                                                                                                                    
+     ## If set to "-", storageClassName: "", which disables dynamic provisioning
+     ## If undefined (the default) or set to null, no storageClassName spec is
+     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+     ##   GKE, AWS & OpenStack)
+     ##
+-    # storageClass: "-"
++    storageClass: "standard-rwo"
+ 
    ## Additional Prometheus server container arguments
    ##
 -  extraArgs: {}

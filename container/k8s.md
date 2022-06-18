@@ -454,6 +454,75 @@ spec:
 
 
 
+# PersistentVolumeClaim
+
+`kubectl delete pvc pvc-01` 했는데도 계속해서 pvc가 남아있다면 `kubectl get -o yaml pvc pvc-01` 결과에 `kubernetes.io/pv-protection` 부분이 있는지 확인해보자. edit 해서 해당 부분을 삭제하면 pvc가 제거된다.
+
+
+
+## Snapshot
+
+> https://kubernetes.io/ko/docs/concepts/storage/volume-snapshots/
+
+CSI Driver를 사용할 수 있는 Storage여야 Snapshot 사용 가능하니 먼저 이 부분을 확인한다. Snapshot은 아래와 같이 만들어준다.
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: snapshotclass-standard-rwo
+  namespace: prometheus
+driver: pd.csi.storage.gke.io
+deletionPolicy: Delete
+```
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-prometheus-server
+  namespace: prometheus
+spec:
+  volumeSnapshotClassName: snapshotclass-standard-rwo
+  source:
+    persistentVolumeClaimName: prometheus-server
+```
+
+Snapshot에서 PVC로 복구시에는 아래와 같이 진행한다.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-server
+  namespace: prometheus
+spec:
+  dataSource:
+    name: snapshot-prometheus-server
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  storageClassName: standard-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+```
+
+
+
+GCP에서는 storage class를 standard로 사용하는 경우에는 csi driver가 지원되지 않는다. snapshot을 써야 한다면 standard-rwo, premium-rwo를 사용하자.
+
+```sh
+$ kubectl get storageclasses.storage.k8s.io
+NAME                 PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+premium-rwo          pd.csi.storage.gke.io   Delete          WaitForFirstConsumer   true                   188d
+standard (default)   kubernetes.io/gce-pd    Delete          Immediate              true                   188d
+standard-rwo         pd.csi.storage.gke.io   Delete          WaitForFirstConsumer   true                   188d
+```
+
+
+
 # Tools
 
 > [helm](https://helm.sh/) : package manager
