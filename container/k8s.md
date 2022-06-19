@@ -511,7 +511,7 @@ spec:
 
 
 
-GCP에서는 storage class가 standard인 경우 csi driver가 지원되지 않는다. snapshot을 써야 한다면 standard-rwo, premium-rwo를 사용하자.
+GCP에서는 storage class가 standard인 경우 CSI Driver가 지원되지 않는다. snapshot을 써야 한다면 standard-rwo, premium-rwo를 사용하자.
 
 ```sh
 $ kubectl get storageclasses.storage.k8s.io
