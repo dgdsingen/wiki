@@ -62,6 +62,13 @@ git config --system credential.helper store
 git config --unset credential.helper
 git config --global --unset credential.helper
 git config --system --unset credential.helper
+
+# mac 한글 자소분리 이슈 해결
+git config --global core.precomposeunicode true
+git config --local core.precomposeunicode true
+
+git config --global core.quotepath false
+git config --local core.quotepath false
 ```
 
 ## OS별 개행문자 설정
