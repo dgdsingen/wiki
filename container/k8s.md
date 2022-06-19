@@ -212,8 +212,81 @@ curl -I http://`minikube ip`/healthz
 ### Enable metrics-server
 
 ```sh
-mk addons enable metrics-server
+minikube addons enable metrics-server
 # 이후 kubectl top 사용 가능해짐
+```
+
+
+
+### Enable CSI Driver, VolumeSnapshot
+
+> https://minikube.sigs.k8s.io/docs/tutorials/volume_snapshots_and_csi/
+
+```sh
+minikube addons enable volumesnapshots
+minikube addons enable csi-hostpath-driver
+```
+
+이후 아래와 같이 StorageClass와 VolumeSnapshotClass가 생성된 것을 볼 수 있다.
+
+```sh
+$ kubectl get StorageClass
+NAME                 PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+csi-hostpath-sc      hostpath.csi.k8s.io        Delete          Immediate           false                  7m23s
+standard (default)   k8s.io/minikube-hostpath   Delete          Immediate           false                  101d
+
+$ kubectl get VolumeSnapshotClass
+NAME                     DRIVER                DELETIONPOLICY   AGE
+csi-hostpath-snapclass   hostpath.csi.k8s.io   Delete           3m43s
+```
+
+이제 PVC 만들때 `storageClassName: csi-hostpath-sc` 로 넣어주고
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csi-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-hostpath-sc
+```
+
+VolumeSnapshot 만들때 `volumeSnapshotClassName: csi-hostpath-snapclass` 로 넣어주면 된다.
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-demo
+spec:
+  volumeSnapshotClassName: csi-hostpath-snapclass
+  source:
+    persistentVolumeClaimName: csi-pvc
+```
+
+Restore 시에도 마찬가지.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csi-pvc-restore
+spec:
+  storageClassName: csi-hostpath-sc
+  dataSource:
+    name: snapshot-demo
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 ```
 
 
