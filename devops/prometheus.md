@@ -396,8 +396,8 @@ Prometheus는 Clustering을 지원하지 않는다. 대신 Federation을 지원�
 
 ```mermaid
 graph
-A[Parent Prometheus] -->B(Child Prometheus)
-A[Parent Prometheus] -->C(Child Prometheus)
+A[Parent Prometheus] -->|Scrape| B(Child Prometheus 1)
+A[Parent Prometheus] -->|Scrape| C(Child Prometheus 2)
 ```
 
 
@@ -418,13 +418,13 @@ A[Parent Prometheus] -->C(Child Prometheus)
 +            - "child-prometheus:9090"
 ```
 
-Parent Grafana의 Datasource는 Parent Prometheus이고, Child Grafana의 Datasource는 Child Prometheus 이며
-
-Parent Prometheus에서 Child Prometheus를 위 설정과 같이 Scrape 하는 Federation 구조라고 가정해보자.
+- Parent Grafana의 Datasource: Parent Prometheus
+- Child Grafana의 Datasource: Child Prometheus
+- Parent Prometheus => Child Prometheus 로 Scrape 하는 Federation 구조라고 가정해보자.
 
 Child Grafana의 Dashboard를 Parent Grafana로 Migration 할 때, JSON Model을 그대로 복붙하면 Datasource UID가 틀리다고 에러가 난다.
 
-이 때는 Child Grafana Dashboard의 JSON Model을 일단 그대로 복사한 뒤, Datasource UID 부분만 Parent Grafana의 Parent Prometheus의 값으로 Replace하면 된다.
+Child Grafana Dashboard의 JSON Model을 일단 그대로 복사한 뒤, Datasource UID 부분만 Parent Grafana의 Parent Prometheus의 값으로 Replace하면 된다.
 
 
 
