@@ -167,6 +167,20 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
      ##
 -    size: 2Gi
 +    size: 10Gi
+
+  # federation이 필요한 경우 아래와 같이 추가
+  prometheus.yml:
+    scrape_configs:
++      - job_name: "federate"
++        honor_labels: true
++        metrics_path: "/federate"
++        params:
++          'match[]':
++            - '{job=~".*"}'
++            - '{__name__=~"job:.*"}'
++        static_configs:
++          - targets:
++            - "child-prometheus:9090"
 ```
 
 
@@ -368,7 +382,53 @@ mysql:
 
 
 
-## Thanos + Prometheus + Grafana
+## HA 구성
+
+### Federation
+
+> https://prometheus.io/docs/prometheus/latest/federation/
+
+
+
+Prometheus는 Clustering을 지원하지 않는다. 대신 Federation을 지원한다.
+
+아래와 같이 각 영역을 담당하는 Child Prometheus가 있고, Parent Prometheus가 Child Prometheus들로부터 Scrape하는 방식이다.
+
+```mermaid
+graph
+A[Parent Prometheus] -->B(Child Prometheus)
+A[Parent Prometheus] -->C(Child Prometheus)
+```
+
+
+
+```diff
+  # federation이 필요한 경우 아래와 같이 추가
+  prometheus.yml:
+    scrape_configs:
++      - job_name: "federate"
++        honor_labels: true
++        metrics_path: "/federate"
++        params:
++          'match[]':
++            - '{job=~".*"}'
++            - '{__name__=~"job:.*"}'
++        static_configs:
++          - targets:
++            - "child-prometheus:9090"
+```
+
+Parent Grafana의 Datasource는 Parent Prometheus이고, Child Grafana의 Datasource는 Child Prometheus 이며
+
+Parent Prometheus에서 Child Prometheus를 위 설정과 같이 Scrape 하는 Federation 구조라고 가정해보자.
+
+Child Grafana의 Dashboard를 Parent Grafana로 Migration 할 때, JSON Model을 그대로 복붙하면 Datasource UID가 틀리다고 에러가 난다.
+
+이 때는 Child Grafana Dashboard의 JSON Model을 일단 그대로 복사한 뒤, Datasource UID 부분만 Parent Grafana의 Parent Prometheus의 값으로 Replace하면 된다.
+
+
+
+### Thanos + Prometheus + Grafana
 
 Thanos를 Sidecar로 붙혀서 Prometheus HA 구성을 한다. kube-prometheus-stack에서 해당 구성을 통으로 제공한다.
 
