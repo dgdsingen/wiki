@@ -285,6 +285,14 @@ argparse                                1.2.1                                   
 
 
 
+## image history 모두 보기
+
+```sh
+docker history image_id --no-trunc
+```
+
+
+
 ## Docker Desktop 유료화
 
 Docker Desktop이 유료화 됩니다. (Docker가 아니라 Docker Desktop입니다)
