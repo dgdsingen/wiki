@@ -474,6 +474,8 @@ git remote set-head origin -a
 
 ## group/repo 일괄 git clone
 
+> https://docs.gitlab.com/ee/api/index.html#keyset-based-pagination: GitLab API Pagenation
+
 ```sh
 #!/bin/bash
 
@@ -490,6 +492,14 @@ for group in $(http "${GITLAB_HOST}/api/v4/groups/" "PRIVATE-TOKEN":"$GITLAB_TOK
     done
 
     cd ..
+done
+
+# httpie가 없고 group이 중첩 구조인 경우 모든 프로젝트 clone
+export GITLAB_HOST="https://gitlab.com"
+export GITLAB_TOKEN="GITLAB에서 TOKEN을 발급받아 여기에 넣으세요"
+
+for project in $(curl "${GITLAB_HOST}/api/v4/projects?pagination=keyset\&per_page=999\&order_by=id\&sort=asc" -H "PRIVATE-TOKEN:$GITLAB_TOKEN" | jq ".[].web_url" | tr -d '"'); do
+    git clone $(echo $project | sed "s#http://#http://oauth2:$GITLAB_TOKEN@#")
 done
 ```
 
