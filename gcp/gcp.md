@@ -172,6 +172,23 @@ Cloud SQL에 Private IP를 부여하기 위해서는 VPC에 Private Service Conn
 
 
 
+## Export database
+
+> https://cloud.google.com/sql/pricing#mysql-pg-pricing: Serverless Export는 별도의 비용이 있음
+
+```sh
+# get database's serviceAccount
+SA=$(gcloud sql instances describe mysql-test --project project-test-id | grep serviceAccountEmailAddress | awk '{print $2}')
+
+# add permission
+gsutil iam ch "serviceAccount:${SA}:objectAdmin" gs://sqldump-test
+
+# export database
+gcloud sql export sql mysql-test gs://sqldump-test/test.gz --database=test --offload --project project-test-id
+```
+
+
+
 # GKE
 
 ## Create Cluster
