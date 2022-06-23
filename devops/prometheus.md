@@ -562,11 +562,11 @@ Dashboard 맨 위에 Variables가 selectbox로 노출된다. Variables 중 node�
 
 #### k8s node CPU Core
 
-- Query: `machine_cpu_cores{kubernetes_io_hostname="$node"}` 
+- Query: `kube_node_status_capacity{resource="cpu", node="$node"}` 
 
 #### k8s node Memory
 
-- Query: `machine_memory_bytes{instance="$node"}` 
+- Query: `kube_node_status_capacity{resource="memory", node="$node"}` 
 
 
 
