@@ -184,7 +184,8 @@ SA=$(gcloud sql instances describe mysql-test --project project-test-id | grep s
 gsutil iam ch "serviceAccount:${SA}:objectAdmin" gs://sqldump-test
 
 # export database
-gcloud sql export sql mysql-test gs://sqldump-test/test.gz --database=test --offload --project project-test-id
+gcloud sql export sql mysql-test gs://sqldump-test/test.gz --database=test --offload --project project-test-id &
+wait # for parallel jobs
 ```
 
 
