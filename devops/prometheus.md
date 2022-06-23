@@ -502,6 +502,10 @@ Dashboard 맨 위에 Variables가 selectbox로 노출된다. Variables 중 node�
 
 ### Query
 
+> https://prometheus.io/docs/prometheus/latest/querying/operators/
+
+
+
 #### k8s master 정상 가동률
 
 - Query: `avg(avg_over_time((sum without ()(kube_pod_container_status_ready{namespace="kube-system",pod=~".*.dashboard.*|.*.dns.*|kube.*|.*.calico.*|.*.flannel.*|.*.etcd.*"}) / count without ()(kube_pod_container_status_ready{namespace="kube-system",pod=~".*.dashboard.*|.*.dns.*|kube.*|.*.calico.*|.*.flannel.*|.*.etcd.*"}))[$duration:5m]))` 
@@ -526,11 +530,11 @@ Dashboard 맨 위에 Variables가 selectbox로 노출된다. Variables 중 node�
 
 #### k8s node 별 CPU 사용률
 
-- Query: `(avg by (node,nodename) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait"}[$duration])) + on(node) group_left(nodename) node_uname_info) - 1` 
+- Query: `sum by(node) (rate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait"}[$duration])) / on(node) group_left() kube_node_status_capacity{resource="cpu"}` 
 
 #### k8s node 별 Memory 사용량
 
-- Query: `((node_memory_MemTotal_bytes  + on(instance) group_left(nodename) node_uname_info) - (node_memory_MemAvailable_bytes  + on(instance) group_left(nodename) node_uname_info))` 
+- Query: `sum by(node) (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)` 
 
 #### k8s 초당 네트워크 트래픽
 
@@ -550,7 +554,7 @@ Dashboard 맨 위에 Variables가 selectbox로 노출된다. Variables 중 node�
 
 #### k8s node CPU 사용률
 
-- Query: `avg by(node) (irate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[$duration]))` 
+- Query: `sum by(node) (rate(node_cpu_seconds_total{mode!~"guest.*|idle|iowait", node="$node"}[$duration])) / on(node) group_left() kube_node_status_capacity{resource="cpu", node="$node"}` 
 
 #### k8s node Memory 사용률
 
@@ -627,25 +631,17 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 - Value Options:
     - Calculation: `Last *` 
 
-
-
 #### k8s 서비스 별 cpu 사용률
 
 - Query: `avg by(container) (avg by(container, pod) (rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) / on(pod) group_left(container) kube_pod_container_resource_limits{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", resource="cpu"})` 
-
-
-
-#### k8s pod 별 cpu 사용률
-
-- Query: `avg by(pod) (avg by(pod) (rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) / on(pod) group_left() kube_pod_container_resource_limits{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", resource="cpu"})` 
-
-
 
 #### k8s 서비스 별 memory 사용량
 
 - Query: `avg(container_memory_working_set_bytes{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}) by(container)` 
 
+#### k8s pod 별 cpu 사용률
 
+- Query: `avg by(pod) (avg by(pod) (rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) / on(pod) group_left() kube_pod_container_resource_limits{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", resource="cpu"})` 
 
 #### k8s pod 별 memory 사용량
 
