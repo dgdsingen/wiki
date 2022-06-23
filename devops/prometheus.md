@@ -621,6 +621,14 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 
 
+#### k8s 서비스 별 pod 개수
+
+- Query: `count by (container) (container_spec_memory_reservation_limit_bytes{namespace!~"kube-system|prometheus|default|whatap-monitoring", pod!="", container!~"POD|"})` 
+- Value Options:
+    - Calculation: `Last *` 
+
+
+
 ## Datasource: Google Cloud Monitoring
 
 default dashboard의 Load Balancing에 데이터가 나오지 않는 경우가 있다. 
