@@ -631,13 +631,13 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 #### k8s 서비스 별 cpu 사용률
 
-- Query: `avg(rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) by(container)` 
+- Query: `avg by(container) (avg by(container, pod) (rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) / on(pod) group_left(container) kube_pod_container_resource_limits{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", resource="cpu"})` 
 
 
 
 #### k8s pod 별 cpu 사용률
 
-- Query: `avg(rate(container_cpu_usage_seconds_total{image!="", namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|"}[$duration])) by(pod)` 
+- Query: `avg by(pod) (avg by(pod) (rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) / on(pod) group_left() kube_pod_container_resource_limits{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", resource="cpu"})` 
 
 
 
