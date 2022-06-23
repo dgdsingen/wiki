@@ -1,3 +1,17 @@
+# CLI
+
+```sh
+# 서버 접속해서 SQL 실행
+mysql -uroot -p'password' -h 172.31.1.2 -e "select id from information_schema.processlist where user like 'appuser'"
+
+# slow query 죽이기
+for i in $(mysql -uroot -p'password' -h 172.31.1.2 -e  "select id from information_schema.processlist where user like 'appuser' and time > 10"); do
+  mysql -uroot -p'password' -h 172.31.1.2 -e "kill ${i}"
+done
+```
+
+
+
 # Import, Export
 
 ```sh

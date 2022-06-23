@@ -24,13 +24,82 @@
 
 
 
+# Admin
+
+> https://admin.google.com: 계정/그룹 관리용. 여기서 계정/그룹을 생성하면 GCP IAM에서 해당 계정/그룹에 프로젝트별 권한을 부여할 수 있게 된다.
+>
+> https://domains.google.com: 도메인 관리
+>
+> https://console.cloud.google.com
+
+
+
+## Create Organization
+
+- Google 계정을 하나 준비한다.
+- Organization Root로 사용할 도메인 test.com을 구입하고 레코드를 설정할 수 있어야 도메인 인증이 된다.
+- 해당 Google 계정으로 GCP > IAM & Admin > Identity & Organization > GO TO CHECKLIST
+    - 1번 항목을 OPEN 하여 도메인 인증 절차를 거치고 admin@test.com 계정을 생성
+    - 해당 계정으로 GCP 콘솔에 로그인하면 자동으로 도메인과 연계된 Organization이 생성됨
+- Cloud Identity는 admin@test.com 계정으로 Admin Console > admin.google.com에 접속하여 설정 가능. User 관리, Group 관리, Domain 소유권 관리 모두 Admin Console에서 가능.
+
+
+
+## Create Project
+
+- https://console.cloud.google.com > IAM & Admin > Manage resources > CREATE PROJECT
+    - admin@test.com 계정으로 로그인
+    - Folder Name: test (Project에 맞게 생성하거나 기존 Folder 사용)
+    - Organization: test.com
+    - Location: test.com
+
+
+
 # IAM
 
 > https://cloud.google.com/sdk/gcloud/reference/projects/add-iam-policy-binding
 
+GCP에서는 특정 GCP Project 안에서 IAM User를 만드는 개념이 아니고, 모든 Gmail 계정이나 Cloud Identity, Google Workspace 계정 등 Google Service를 이용하는 계정이 있으면 IAM 권한을 추가할 수 있음. 
+
+홈서비스플랫폼 프로젝트에서는 실제 사용자들을 위한 계정으로 Cloud Identity를, 애플리케이션용으로 Service Account를 사용함.
+
+Cloud Identity는 Admin 콘솔 - admin.google.com에서 관리함.
+
+
+
 ```sh
+# 계정에 권한 부여하기
 gcloud projects add-iam-policy-binding PROJECT_ID --role='roles/viewer' --member='user:test@google.com'
 ```
+
+
+
+## Groups
+
+각 개별 IAM User에 Roles을 할당하게 되면 그 인원이 프로젝트를 철수하거나 퇴사할 때, 혹은 새로운 인원이 추가될 때 Roles을 관리하기가 어렵고 번거로움. 따라서 Group을 만들어 User를 특정 Group에 속하게 한 뒤, Group에 Role을 부여하는 것이 바람직함. 특정 User에 Role을 주는 것은 특별한 경우가 아니면 지양함.
+
+
+
+## Users
+
+Google Role-based Support Case Open은 admin@test.com으로만 가능함.
+
+
+
+## Service Accounts
+
+VM, 혹은 애플리케이션에 사용하는 계정으로, 특별한 일이 없으면 VM 생성시 기본 Service Account를 사용함.
+
+CI/CD나 GKE, 보안점검 등에는 Service Account를 따로 생성하여 사용함.
+
+> **IAM Roles 부여시 주의사항**
+> GCP에서는 특정 IAM 계정에 여러 프로젝트의 자원에 대한 권한을 할당한다는 느낌보다는, 특정 프로젝트에 한 IAM 계정이 해당 프로젝트 내의 자원에 대한 권한을 가질 수 있도록 설정함. AWS와 다른 부분으로 처음에는 어색하게 느껴질 수 있음.
+
+
+
+만약 Service Account에 한 Project가 아니라 전체 Project에 대한 권한을 일괄 부여하고 싶다면, GCP > Project: smarthomelab.co.kr > IAM 가서 권한 주면 하위 Project로 일괄 적용된다.
+
+
 
 
 
@@ -132,6 +201,64 @@ gcloud functions deploy memories-thumbnail-creator --runtime nodejs14 --trigger-
 
 
 # Cloud SQL
+
+## Create DB
+
+- GCP > SQL > CREATE INSTANCE > Choose MySQL
+    - Instance ID: sql-{region}-{project}-{env} (ex: sql-an3-test-prd)
+    - Password: password
+    - Database version: MySQL 8.0
+    - Region: asia-northeast3 (Seoul)
+    - Zonal availability: Single zone
+    - Machine Type: Standard 2 vCPU, 7.5GB
+    - Storage: SSD, 100GB
+    - Enable automatic storage increases: On
+    - Instance IP assignment: Private IP
+        - Associated networking: Networks shared with me (from host project: project-test-id)
+            - vpc-test
+        - Allocated IP range: Use automatically assigned IP range or allocip-test-prd
+            - 개발/검수 PSA (Private Service Access): 172.31.2.0/23
+            - 운영 PSA (Private Service Access): 172.31.4.0/23
+                - CloudSQL, Memorystore 등 Private Service Access를 위해서는 IP 할당이 필요함. 이 IP 대역과 Shared VPC의 대역이 자동으로 Peering이 맺어지고, 이 IP 대역은 Shared VPC와  Peering을 맺은 다른 VPC로 전파되지는 않음. 하지만 Shared VPC 입장에서는 각 Peering을 맺는 VPC간  라우팅이 겹쳐야 하지 않기 때문에 아무 IP를 쓸 수는 없음. On-premise에서 이미 할당되어 사용하고 있는 앞으로 GCP 쪽으로 라우팅이 되지 않을 IP 대역을 찾아서 할당함. 개발/검수 환경에는 172.31.2.0/23,  운영환경에는 172.31.4.0/23 대역을 할당함. CloudSQL의 경우 `/24` 대역을 먼저 차지하고 그 안에서 자동으로 IP가 할당됨. Memorystore Redis의 경우 `/29` 대역을 할당함.
+    - Automate backups: On, 4:00 AM - 8:00 AM
+        - Choose where to store your backups: Multi-region (default)
+        - Location: asia - Data centers in Asia
+        - Choose how many automated backups to store: 7
+    - Enable point-in-time recovery: On
+        - Choose how many days of logs to retain: 7
+    - Maintenance window: Sunday, 03:00 - 04:00
+    - Order of update: Any
+    - Flags
+        - character_set_server: utf8
+        - default_time_zone: +09:00
+        - general_log: Off
+        - group_concat_max_len: 1048576
+        - innodb_file_per_table: On
+        - innodb_print_all_deadlocks: On
+        - interactive_timeout: 7200
+        - join_buffer_size: 33554432
+        - local_infile: Off
+        - log_bin_trust_function_creators: On
+        - log_output: FILE
+        - long_query_time: 1
+        - max_allowed_packet: 524288000
+        - read_buffer_size: 1048576
+        - read_rnd_buffer_size: 1048576
+        - slow_query_log: On
+        - sort_buffer_size: 33554432
+        - sql_mode: PIPES_AS_CONCAT, IGNORE_SPACE, ONLY_FULL_GROUP_BY, STRICT_ALL_TABLES, STRICT_TRANS_TABLES, NO_ZERO_IN_DATE, NO_ZERO_DATE, ERROR_FOR_DIVISION_BY_ZERO, TRADITIONAL, NO_ENGINE_SUBSTITUTION
+        - transaction_isolation: READ-COMMITTED
+        - wait_timeout: 7200
+
+
+
+## Create Replica
+
+- GCP > SQL > Instance 우측 Actions 버튼 클릭 > Create read replica
+    - Instance ID: sql-{region}-{project}-{env}-replica (ex: sql-an3-test-prd-replica)
+    - 나머지 옵션은 Master와 동일하게 설정됨
+
+
 
 ## Private Service Connection
 
@@ -379,7 +506,7 @@ gcloud compute ssh vm-an3-kubectl --zone asia-northeast3-c --project pjt-test-sh
 관리용 User로 Switch
 
 ```sh
-sudo su - hip-dev
+sudo su - admin
 
 # 필요한 경우 User, Auth 설정
 sudo su -
@@ -679,6 +806,27 @@ NEG 수동 추가는 아래와 같이 진행한다. 이 경우 `kubectl get svcn
 > [Async Pull](https://cloud.google.com/pubsub/docs/samples/pubsub-subscriber-async-pull) 
 >
 > [Sync Pull](https://cloud.google.com/pubsub/docs/samples/pubsub-subscriber-sync-pull) 
+
+
+
+## Create topic & subscription
+
+```sh
+# variables
+PRJOECT_PRD="pjt-homin-hip-prd-210105"
+
+TOPIC_NAME="pc-shortenUrl"
+LABEL_NAME="테스트"
+LABEL_PUB="pub"
+LABEL_SUB="sub"
+SUB_NAME=$TOPIC_NAME
+
+# create topic
+gcloud pubsub topics create $TOPIC_NAME --project $PRJOECT_PRD --labels=env=prd,name=$LABEL_NAME,pub=$LABEL_PUB,sub=$LABEL_SUB
+
+# create subscription
+gcloud pubsub subscriptions create $SUB_NAME --project $PRJOECT_PRD --topic=$TOPIC_NAME --expiration-period=never --enable-message-ordering
+```
 
 
 

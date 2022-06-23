@@ -183,6 +183,55 @@ Server :  local         dev          stg          prd
 
 
 
+## Pipeline
+
+- Repository 생성
+    - 최초 Repository 생성은 Maintainer 권한을 가진 사용자가 생성
+    - 프로젝트를 생성 후 최초 소스를 master origin에 push
+        - ```sh
+            git init
+            git remote add origin http://gitlab.test.com/test/example.git
+            git add .
+            git commit -m "init"
+            git push -u origin master
+            ```
+    - 최초 생성된 master 브랜치로부터 develop 브랜치를 생성한다.
+    - Repository 권한 부여 by Admin/Owner
+- GitLab > Admin Area > Overview > Runners > Runner 선택 > Assigned projects에 Project 추가
+- 권한설정
+    - GitLab > Repo 선택 > Settings > Repository > Protected Branches > develop 브랜치에 Protected 설정
+    - master, develop 브랜치는 보통 protected로 설정되어 있어서 빌드/배포가 가능하다.
+    - 개발자는 develop 브랜치에 대한 merge 권한만 주고, push 권한은 제외해 개발자는 feature를 통해서 merge 하도록 한다. 다만 hotfix는 Developer에도 모든 권한을 준다.
+    - GitLab > Repo 선택 > Settings > Repository > Protected Tags > Protected Tags 설정
+    - Protected Tags 설정을 해야만 Tag에 의한 운영 배포 시 Protected 하게 설정된 글로벌 변수를 사용할 수 있다.
+    - Protected Tags 설정이 된 Tag 들을 부득이하게 삭제 할 경우 Protected를 풀어줘야 한다.(삭제 후 재설정)
+    - 프로젝트에 대한 담당 개발자에게 개발 권한을 준다.
+- 개발자 로컬에 `git clone ${repo}` 
+- 기능 개발 (feature > develop)
+    - 새로운 기증을 개발하기 위해 feature 브랜치 생성
+        - ```sh
+            git checkout -b feature/test1
+            ```
+    - 개발이 완료되면 Gitlab 서버에 feature 브랜치를 push
+        - ```sh
+            git commit -a -m "test1"
+            git push origin feature/test1
+            ```
+    - feature 브랜치를 develop 브랜치에 merge
+    - develop 브랜치의 pipeline이 성공 여부를 확인 후 dev 환경에서 테스트를 한다.
+- Staging 배포
+    - 개발환경에서 테스트가 통과하면, master 브랜치에 merge request를 한다.
+    - merge request 요청을 받고, 담당 Maintainer가 review & merge를 진행한다.
+    - master 브랜치의 pipeline이 성공여부를 확인 후 스테이지 환경에서 테스트를 한다.
+- Production 배포
+    - 스테이지 환경에서 Maintainer가 테스트가 통과하면, 태깅 작업을 통해 운영환경에 배포한다.
+    - Tag name은 protected 설정된 글로벌 변수를 사용하기 위해 protected tag에 설정한 패턴에 따른다. 현재 protected tag는 prod-* 로 되어있다.
+    - master 브랜치로부터 태깅한다. develop 브랜치로 태깅시 운영환경 빌드 과정에서 오류가 발생한다.
+    - 이전 master 커밋에 대한 Tag 작업은 해당 커밋 화면에서 진행 할 수 있다. 해당 commit > Options > Tag 클릭
+    - 운영환경의 파이프 라인을 통해 배포 확인 후 운영환경에서 해당 기능을 점검한다.
+
+
+
 
 # Jenkins
 
