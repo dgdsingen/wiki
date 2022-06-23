@@ -629,6 +629,30 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 
 
+#### k8s 서비스 별 cpu 사용률
+
+- Query: `avg(rate(container_cpu_usage_seconds_total{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}[$duration])) by(container)` 
+
+
+
+#### k8s pod 별 cpu 사용률
+
+- Query: `avg(rate(container_cpu_usage_seconds_total{image!="", namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|"}[$duration])) by(pod)` 
+
+
+
+#### k8s 서비스 별 memory 사용량
+
+- Query: `avg(container_memory_working_set_bytes{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}) by(container)` 
+
+
+
+#### k8s pod 별 memory 사용량
+
+- Query: `sum(container_memory_working_set_bytes{namespace!~"kube-system|default|prometheus|whatap-monitoring", container!~"POD|", image!=""}) by(pod)` 
+
+
+
 ## Datasource: Google Cloud Monitoring
 
 default dashboard의 Load Balancing에 데이터가 나오지 않는 경우가 있다. 
