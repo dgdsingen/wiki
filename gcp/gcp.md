@@ -801,6 +801,119 @@ NEG 수동 추가는 아래와 같이 진행한다. 이 경우 `kubectl get svcn
 
 
 
+### Failover
+
+Standard는 Primary 뒤에 숨겨진 Replica가 있어서 failover 시 Replica를 Primary로 승격시킨다. (Read Replica는 아니다. 접근할 Read Endpoint 없고 그냥 백업용)
+
+Standard 모드에서 Read Replica를 추가할 수는 있으나, Read Replica가 있더라도 어차피 Write가 안되면 서비스 장애라 Primary의 failover를 기다려야 하고 또한 Read 부하가 커서 분산을 해야 하는 상황도 아니라면 이 방안은 쓸모가 없다. 
+
+이에 Standard 모드에서 Primary failover 시 시간이 얼마나 걸리는지 테스트 해봄.
+
+
+
+아래와 같은 코드를 돌려둔 뒤
+
+```sh
+pip3 install redis
+```
+
+```python
+import datetime
+import random
+import redis
+import time
+
+failover_started = False
+
+while True:
+    print(datetime.datetime.now())
+    
+    try:
+        rd = redis.StrictRedis(host='172.31.247.20', port=6379, db=0)
+        key = f"key{random.randrange(1,9999)}"
+        val = f"val{random.randrange(1,9999)}"
+        rd.set(key, val)
+        print(f"{key}:{rd.get(key)}")
+        
+        if failover_started:
+            print(f"{datetime.datetime.now()} failover_ended")
+            break
+    except:
+        print(f"{datetime.datetime.now()} failover_started")
+        failover_started = True
+
+    time.sleep(0.5)
+```
+
+
+
+수동 failover 명령을 내려서
+
+```sh
+gcloud redis instances failover redis-an3-hip-dev-failover-test --region asia-northeast3 --project pjt-homin-hip-dev-201211
+```
+
+
+
+3회 테스트한 log를 보니 failover 완료되는데 평균 약 32초 정도 걸린다.
+
+```sh
+2022-02-24 17:03:53.085203
+key8577:b'val9798'
+2022-02-24 17:03:53.588885
+key9469:b'val75'
+2022-02-24 17:03:54.091912
+key8307:b'val2941'
+2022-02-24 17:04:09.952236
+key3061:b'val7455'
+# 갭은 17:03:54 ~ 17:04:25 약 31초
+2022-02-24 17:04:25.825186
+key421:b'val3135'
+2022-02-24 17:04:26.328195
+key4595:b'val1308'
+2022-02-24 17:04:26.830922
+key1130:b'val2764'
+```
+
+```sh
+2022-02-24 17:07:47.274608
+key1558:b'val5605'
+2022-02-24 17:07:47.777769
+key8619:b'val8028'
+2022-02-24 17:07:48.280998
+2022-02-24 17:07:48.283477 failover_started
+2022-02-24 17:07:48.784193
+key721:b'val641'
+# 갭은 17:07:48 ~ 17:08:20 약 32초
+2022-02-24 17:08:20.332447 failover_ended
+```
+
+```sh
+2022-02-24 17:09:53.199303
+key5677:b'val4249'
+2022-02-24 17:09:53.702507
+key6150:b'val2163'
+2022-02-24 17:09:54.205862
+key4177:b'val30'
+# 갭은 17:09:54 ~ 17:10:26 약 32초
+2022-02-24 17:10:26.272525
+key1863:b'val7257'
+2022-02-24 17:10:26.775828
+key4343:b'val1293'
+2022-02-24 17:10:27.278878
+key6848:b'val2443'
+2022-02-24 17:10:27.781874
+key3154:b'val403'
+```
+
+
+
+Redis의 여러 HA 방안들을 비교하면 아래와 같다.
+
+![image-20220624154112517](images/gcp/image-20220624154112517.png)
+
+
+
 # Pub/Sub
 
 > [Async Pull](https://cloud.google.com/pubsub/docs/samples/pubsub-subscriber-async-pull) 
@@ -1020,6 +1133,38 @@ sudo apt-get install google-fluentd
 
 
 
+## 메모리 누수 이슈
+
+stackdriver-agent, google-fluentd가 설치된 서버에서 갑자기 disk io가 peak 치고 서비스 불가한 상황이 있었다.
+
+잔여 메모리가 없는데 메모리가 필요한 작업이 돌아갈때 swap이 발생하면서 disk io가 peak 친 것이 아닌가 추측했으나, swap이 아닌 memory cache가 소진되어서 disk read가 급증했던 것으로 분석되었다.
+
+> [[Linux] 메모리를 다 쓰면 일어나는 일 핵심 요약](https://eyeballs.tistory.com/454) 
+
+그 근거로 우선 `free -h` 실행시 swap 총량이 0이다.
+
+```sh
+[test@vm-test ~]$ free -h
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       5.2Gi       1.4Gi       2.3Gi       8.8Gi       8.0Gi
+Swap:            0B          0B          0B
+```
+
+게다가 read 부하가 압도적으로 크고 write 부하는 거의 없었다. 
+
+swap/paging이 일어났다면 memory 데이터를  disk로 옮길때 write 부하가 있었어야 한다.
+
+vm-test 서버에서 보니 `stackdriver-agent`, `google-fluentd` 가 메모리를 많이 먹고 있어서 (15G 거의 풀 사용) 리스타트하여 7G 정도 확보함
+
+```sh
+sudo systemctl restart stackdriver-agent
+sudo systemctl restart google-fluentd
+```
+
+메모리 확보 후 후 disk io가 평화로워짐.
+
+
+
 # gcloud
 
 ## install
@@ -1191,6 +1336,23 @@ gsutil -m setmeta -h "Cache-Control:" "gs://test.com/resources/**.js"
 
 # macOS에서는 multiprocess 관련 에러가 날 수 있어 -o "GSUtil:parallel_process_count=1" 옵션을 추가
 gsutil -m -o "GSUtil:parallel_process_count=1" setmeta -h "Cache-Control:" "gs://test.com/resources/**.js"
+```
+
+
+
+샘플 스크립트
+
+```sh
+# 캐시는 1년을 유지한다. 1y = 31536000s
+CACHE_CONTROL="Cache-Control:public, max-age=31536000"
+# gsutil cp 시 src 가 존재하지 않으면 명령이 실패하므로, artifacts가 expired 되어 .nuxt 가 없어도 bucket 의 데이터는 삭제되지 않는다.
+gsutil -m -h "${CACHE_CONTROL}" cp -r -z js,css .nuxt/dist/client/* gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_resources/${CI_COMMIT_SHORT_SHA}/client/
+# gsutil -z js,css 로 gzip 압축 전송시 Cache-Control:no-transform 이 자동으로 추가된다.
+# 그러면 CDN에서 Cloud Storage의 js,css 호출시 Accept-Encoding:none 이어도 무조건 gzip 압축본을 전송한다.
+# Accept-Encoding:gzip 일때만 gzip 압축본을 전송하고, Accept-Encoding:none 일때는 비압축본을 전송하려면
+# 다시 Cache-Control 헤더를 overwrite 해서 no-transform 옵션을 제거해준다.
+gsutil -m setmeta -h "${CACHE_CONTROL}" "gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_resources/${CI_COMMIT_SHORT_SHA}/client/**.js"
+gsutil -m setmeta -h "${CACHE_CONTROL}" "gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_resources/${CI_COMMIT_SHORT_SHA}/client/**.css"
 ```
 
 

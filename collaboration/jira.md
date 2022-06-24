@@ -1,84 +1,3 @@
-# Server
-
-- License: 각 1EA 씩
-    - Jira Software (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - Confluence (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - The Pivot Gadget (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - WBS Gantt-Chart for JIRA (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - JSU Automation Suite For Jira Workflows (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - Scriptrunner for JIRA (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-    - Draw.io Diagrams for Confluence (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
-- Install
-    - atlassian-jira-software-8.14.0-x64.bin
-    - atlassian-confluence-7.10.0-x64.bin
-    - Plugins
-        - groovyrunner-6.16.0.jar
-        - jira-suite-utilities-2.24.3.jar
-        - pivotgadget-1.8.2-jira67.jar
-        - wbsgantt-for-jira-9.13.1.1.obr
-        - drawio-confluence-plugin-9.5.0.obr
-- Server
-    - mv-jira: 172.31.1.2:8080
-        - /data/jira
-            - /data/jira/bin/startup.sh
-            - /data/jira/bin/shutdown.sh
-        - `{JIRA_HOME}/bin/setenv.sh` 에서 JVM 메모리 설정
-        - Jira가 사용자/그룹 데이터 마스터 역할을 한다. Jira에 사용자/그룹 추가 후 Conf > 설정 > 사용자 디렉토리 > Jira Server 동기화 클릭하면 Conf에 사용자/그룹이 싱크된다.
-        - admin1/admin1234
-    - mv-jira-conf: 172.31.69.3:8080
-        - /data/confluence
-            - /data/confluence/bin/startup.sh
-            - /data/confluence/bin/shutdown.sh
-        - `{CONFLUENCE_HOME}/bin/setenv.sh` 에서 JVM 메모리 설정
-        - admin/admin
-    - mv-jira-db: 172.31.69.4:5432
-        - yum으로 설치했고 Service 등록된 상태: `sudo systemctl start/stop/status postgresql` 
-        - 접속 방법
-
-```sh
-sudo su - postgres
-
-psql
-
-# JIRA Database: jiradb
-# JIRA DB User : jirauser
-# JIRA DB Password : jirapass
-# Confluence Database : confdb
-# Confluence DB User : confuser
-# Confluence DB Password : confpass
-
-create user jirauser with password 'jirapass';
-CREATE DATABASE jiradb WITH ENCODING 'UNICODE' LC_COLLATE 'C' LC_CTYPE 'C' TEMPLATE template0;
-GRANT ALL PRIVILEGES ON DATABASE jiradb TO jirauser;
-
-create user confuser with password 'confpass';
-CREATE DATABASE confdb WITH ENCODING 'UTF8';
-GRANT ALL PRIVILEGES ON DATABASE confdb TO confuser;
-
-# backup: DB backup하는 경우 home directory(data저장위치)는 별도로 backup 필요
-sudo pg_dump --host=localhost --port=5432 --username=jirauser --password --dbname=jiradb > /home/jira/jiradb_backup.sql
-Password: jirapass
-
-sudo pg_dump --host=localhost --port=5432 --username=confuser --password --dbname=confdb > /home/jira/confdb_backup.sql
-Password: confpass
-
-## Xml backup (서비스에 등록되어 있습니다): 매일 주기로 xml backup이 이루어지며 아래 경로에 저장됩니다.
-JIRA Backup File Location : /data/jira-data/export
-Confluence Backup File Location : /data/confluence-data/backups
-
-## Xml backup 실행 주기 및 시간은 따로 설정할 수 있습니다. Xml backup의 경우에도 마찬가지로 data는 따로 백업이 필요합니다.
-JIRA : admin menu – System – Services – Backup Service
-Confluence : admin menu – General – Scheduled jobs
-
-## 수동 XML Backup :
-JIRA : System – Backup System 에서 시행 가능
-Confluence : General – Backup & Restore 에서 시행 가능
-
-## Data backup: Data home directory 전체를 주기적으로 backup 해주시면 됩니다.
-```
-
-
-
 # JSM
 
 ## Create New Project
@@ -629,6 +548,144 @@ sacli --user $1 -k pvt_hw_addr -v $2 UserPropPut
     - WHEN: `Status changed` 
     - IF: `이슈 일치` > `assignee was EMPTY AND assignee is not EMPTY` 
     - THEN: `WebHook` > URL: `webhook url`, 본문: `사용자 정의 페이로드 보내기`, `{"text": "[${issue.summary}](${request.url}) 건의 담당자가 지정되었습니다."}` 
+
+
+
+# Server
+
+- License: 각 1EA 씩
+    - Jira Software (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - Confluence (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - The Pivot Gadget (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - WBS Gantt-Chart for JIRA (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - JSU Automation Suite For Jira Workflows (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - Scriptrunner for JIRA (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+    - Draw.io Diagrams for Confluence (Server) 10 user: New Commercial License Includes 12 months Support and Maintenance
+- Install
+    - atlassian-jira-software-8.14.0-x64.bin
+    - atlassian-confluence-7.10.0-x64.bin
+    - Plugins
+        - groovyrunner-6.16.0.jar
+        - jira-suite-utilities-2.24.3.jar
+        - pivotgadget-1.8.2-jira67.jar
+        - wbsgantt-for-jira-9.13.1.1.obr
+        - drawio-confluence-plugin-9.5.0.obr
+- Server
+    - mv-jira: 172.31.1.2:8080
+        - /data/jira
+            - /data/jira/bin/startup.sh
+            - /data/jira/bin/shutdown.sh
+        - `{JIRA_HOME}/bin/setenv.sh` 에서 JVM 메모리 설정
+        - Jira가 사용자/그룹 데이터 마스터 역할을 한다. Jira에 사용자/그룹 추가 후 Conf > 설정 > 사용자 디렉토리 > Jira Server 동기화 클릭하면 Conf에 사용자/그룹이 싱크된다.
+        - admin1/admin1234
+    - mv-jira-conf: 172.31.69.3:8080
+        - /data/confluence
+            - /data/confluence/bin/startup.sh
+            - /data/confluence/bin/shutdown.sh
+        - `{CONFLUENCE_HOME}/bin/setenv.sh` 에서 JVM 메모리 설정
+        - admin/admin
+    - mv-jira-db: 172.31.69.4:5432
+        - yum으로 설치했고 Service 등록된 상태: `sudo systemctl start/stop/status postgresql` 
+        - 접속 방법
+
+```sh
+sudo su - postgres
+
+psql
+
+# JIRA Database: jiradb
+# JIRA DB User : jirauser
+# JIRA DB Password : jirapass
+# Confluence Database : confdb
+# Confluence DB User : confuser
+# Confluence DB Password : confpass
+
+create user jirauser with password 'jirapass';
+CREATE DATABASE jiradb WITH ENCODING 'UNICODE' LC_COLLATE 'C' LC_CTYPE 'C' TEMPLATE template0;
+GRANT ALL PRIVILEGES ON DATABASE jiradb TO jirauser;
+
+create user confuser with password 'confpass';
+CREATE DATABASE confdb WITH ENCODING 'UTF8';
+GRANT ALL PRIVILEGES ON DATABASE confdb TO confuser;
+
+# backup: DB backup하는 경우 home directory(data저장위치)는 별도로 backup 필요
+sudo pg_dump --host=localhost --port=5432 --username=jirauser --password --dbname=jiradb > /home/jira/jiradb_backup.sql
+Password: jirapass
+
+sudo pg_dump --host=localhost --port=5432 --username=confuser --password --dbname=confdb > /home/jira/confdb_backup.sql
+Password: confpass
+
+## Xml backup (서비스에 등록되어 있습니다): 매일 주기로 xml backup이 이루어지며 아래 경로에 저장됩니다.
+JIRA Backup File Location : /data/jira-data/export
+Confluence Backup File Location : /data/confluence-data/backups
+
+## Xml backup 실행 주기 및 시간은 따로 설정할 수 있습니다. Xml backup의 경우에도 마찬가지로 data는 따로 백업이 필요합니다.
+JIRA : admin menu – System – Services – Backup Service
+Confluence : admin menu – General – Scheduled jobs
+
+## 수동 XML Backup :
+JIRA : System – Backup System 에서 시행 가능
+Confluence : General – Backup & Restore 에서 시행 가능
+
+## Data backup: Data home directory 전체를 주기적으로 backup 해주시면 됩니다.
+```
+
+
+
+## Migration
+
+```sh
+#!/bin/bash
+
+# variables
+yyyy=$(date +%Y)
+mm=$(date +%m)
+dd=$(date +%d)
+
+bak_data="jira-test-data-backup-${yyyy}-${mm}-${dd}.zip"
+bak_plugins="jira-test-plugins-${yyyy}-${mm}-${dd}.tar.gz"
+bak_attachments="jira-test-attachments-${yyyy}-${mm}-${dd}.tar.gz"
+bak_avatars="jira-test-avatars-${yyyy}-${mm}-${dd}.tar.gz"
+bak_logos="jira-test-logos-${yyyy}-${mm}-${dd}.tar.gz"
+bak_install="jira-test-install-${yyyy}-${mm}-${dd}.tar.gz"
+
+gs_path="gs://jira-test/"
+sign_key="202206241730-compute@developer.gserviceaccount.com.json"
+url_txt="jira-url-${yyyy}-${mm}-${dd}.txt"
+
+# create backup files
+sudo -u jira cp "/data/jira-data/export/$(sudo -u jira ls /data/jira-data/export | grep .zip | tail -1)" "${bak_data}"
+sudo chown $(whoami) "${bak_data}"
+sudo -u jira tar cvzf "${bak_plugins}" /data/jira-data/plugins/installed-plugins
+sudo -u jira tar cvzf "${bak_attachments}" /data/jira-data/data/attachments
+sudo -u jira tar cvzf "${bak_avatars}" /data/jira-data/data/avatars
+sudo -u jira tar cvzf "${bak_logos}" /data/jira-data/logos
+sudo -u jira tar cvzf "${bak_install}" --exclude=/data/jira/logs --exclude=/data/jira/temp /data/jira
+
+# upload backup files to cloud storage
+gsutil mv "${bak_data}" "${gs_path}"
+gsutil mv "${bak_plugins}" "${gs_path}"
+gsutil mv "${bak_attachments}" "${gs_path}"
+gsutil mv "${bak_avatars}" "${gs_path}"
+gsutil mv "${bak_logos}" "${gs_path}"
+gsutil mv "${bak_install}" "${gs_path}"
+
+# create signed url
+echo > "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_data}" >> "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_plugins}" >> "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_attachments}" >> "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_avatars}" >> "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_logos}" >> "${url_txt}"
+gsutil signurl -d 12h "${sign_key}" "${gs_path}${bak_install}" >> "${url_txt}"
+gsutil mv "${url_txt}" "${gs_path}"
+```
+
+```sh
+# nohup 실행
+nohup ./bak.sh 2>&1 > log &
+tail -f log
+```
 
 
 

@@ -1179,3 +1179,53 @@ if __name__ == '__main__':
     main2()
 ```
 
+
+
+# Issues
+
+## 도메인 변경 감지
+
+```python
+import os
+import datetime
+
+def get_ips_by_dns_lookup(host, port=80):
+    import socket
+    try:
+        return sorted(list(map(lambda x: x[4][0], socket.getaddrinfo(f"{host}.", port, type=socket.SOCK_STREAM))))
+    except:
+        return ["can't lookup"]
+
+hosts = ["test.com", "www.test.com"]
+# find home dir. ex: /home/test
+dir = os.path.join(os.path.expanduser("~"), "restart_when_ip_changed")
+
+for host in hosts:
+    file = f"{dir}/{host}.txt"
+    os.system(f"touch {file}")
+
+    with open(file, "r") as file_r:
+        old_ip = file_r.read()
+        new_ip = str(get_ips_by_dns_lookup(host))
+
+        if old_ip != new_ip:
+            print(f"{datetime.datetime.now() + datetime.timedelta(hours=9)}(KST) {host}: {old_ip} != {new_ip}")
+            os.system("sudo docker restart test")
+
+            with open(file, "w") as file_w:
+                file_w.write(new_ip)
+        else:
+            print(f"{datetime.datetime.now() + datetime.timedelta(hours=9)}(KST) {host}: {old_ip} == {new_ip}")
+```
+
+```sh
+# run script every 1 minute
+*/1 * * * * python3 /home/test/restart_when_ip_changed.py >> /home/test/restart_when_ip_changed/log
+
+# rm log every monday 01:00
+00 1 * * 1 echo > /home/test/restart_when_ip_changed/log
+
+# restart test everyday 01:00
+00 01 * * * sudo docker restart test >> /home/test/restart_when_ip_changed/log
+```
+

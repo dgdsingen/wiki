@@ -72,22 +72,53 @@ jstat -gcutil -h20 7 5000
 >
 > [Spring Cloud Gateway - Configuration Properties](https://spring.getdocs.org/en-US/spring-cloud-docs/spring-cloud-gateway/configuration-properties/configuration-properties.html) 
 
+`application.yml` 
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: test
+          uri: https://test.com
+          predicates:
+            - Path=/test/**
+---
+spring:
+  profiles: kubernetes
+    gateway:
+      routes:
+        - id: test
+          uri: http://test-svc.default.svc.cluster.local
+          predicates:
+            - Path=/test/**
+          metadata:
+            response-timeout: 1000000
+            connect-timeout: 1000000
+```
+
+
+
 아래와 같이 설정하면 order 때문에 `/test/**` 를 호출하더라도 `/**` 이 먼저 적용되어 버린다. default routes는 맨 밑에 두자.
 
 ```yaml
-# application.yml
-
-- id: all
-  uri: http://all-service.default.svc.cluster.local
-  predicates:
-    - Path=/**
-- id: test
-  uri: http://test-service.default.svc.cluster.local
-  predicates:
-    - Path=/test/**
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: all
+          uri: http://all-service.default.svc.cluster.local
+          predicates:
+            - Path=/**
+        - id: test
+          uri: http://test-service.default.svc.cluster.local
+          predicates:
+            - Path=/test/**
 ```
 
-SCG에서 target 호출시 forwarded, x-forwarded 헤더 보내지 않도록 설정
+SCG에서 target 호출시 forwarded, x-forwarded 헤더 보내지 않도록 설정. 
+
+특히 k8s 환경에서 pod가 가지는 ip나 http 도메인이 outbound gateway를 통해서 그대로 전달되면 외부에서는 이상한 source라고 인식하고 비정상 동작을 할 수 있으니 해당 헤더를 제거해주자.
 
 ```yaml
 spring:
