@@ -694,6 +694,18 @@ Node에 root로 접속하고 싶은 경우 권한이 있는 container를 해당 
 
 
 
+## df-pv
+
+Persistent Volume의 사용량 확인
+
+```sh
+curl https://krew.sh/df-pv | bash
+
+kubectl df-pv
+```
+
+
+
 # Issues
 
 **완료된 CronJob Pod 삭제하기** 
