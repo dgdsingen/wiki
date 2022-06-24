@@ -628,9 +628,14 @@ ecryptfs-unwrap-passphrase
 
 ## Albert
 
+> https://software.opensuse.org/download.html?project=home:manuelschneid3r&package=albert
+
 ```sh
-# 명령 실행 후 강제 종료될 때
+# 명령 실행 후 강제 종료되는 이슈 해결
 rm ~/.config/albert/core.db
+
+# albert가 gnome terminal에서는 뜨지 않는 이슈 해결. 아래 명령어를 keyboard shortcut으로 등록한다.
+albert toggle
 ```
 
 
