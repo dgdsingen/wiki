@@ -55,8 +55,6 @@ f"{datetime.now():%Y-%m-%d %H:%M:%S}"
 
 
 
-
-
 # Concurrent, Parallel
 
 - Concurrent(동시성): 1대의 디바이스에 2개의 큐를 가지고 번갈아가며 요청을 처리하는 것을 생각하면 된다. 
