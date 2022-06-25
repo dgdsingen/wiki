@@ -648,6 +648,12 @@ else
 fi
 ```
 
+pyenv로 설치한 python을 global로 사용하려면 아래와 같이 설정
+
+```sh
+pyenv global 3.10.2
+```
+
 
 
 # pip
