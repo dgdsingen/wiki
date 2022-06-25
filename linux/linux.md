@@ -400,11 +400,33 @@ timedatectl set-ntp yes
 
 
 
+# KVM
+
+```sh
+# kvm2 사용시 우선 가상화 지원 여부부터 확인
+egrep -q 'vmx|svm' /proc/cpuinfo && echo yes || echo no
+
+# install kvm
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+
+# add user to group. 이후 reboot 필요
+sudo adduser `id -un` libvirt
+sudo adduser `id -un` kvm
+
+# validation
+virt-host-validate
+
+# gui virt manager
+sudo apt install virt-manager
+```
+
+
+
 # Ubuntu
 
 ## multipass
 
-> [multipass](https://multipass.run/) 
+> https://multipass.run
 
 ```sh
 mp launch --name primary --cpus 2 --mem 4G --disk 100G

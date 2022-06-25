@@ -45,6 +45,8 @@ sudo dpkg -i minikube_latest_amd64.deb
 
 **minikube config** 
 
+> Linux kvm2 설정은 [linux.md](../linux/linux.md) 참조
+
 ```sh
 # linux
 minikube config set driver kvm2
@@ -70,23 +72,6 @@ if [[ $(uname -a) == *"Darwin"* ]]; then
     # use minikube as a docker host
     eval $(minikube docker-env)
 fi
-```
-
-Linux kvm2 설정
-
-```sh
-# kvm2 사용시 우선 가상화 지원 여부부터 확인
-egrep -q 'vmx|svm' /proc/cpuinfo && echo yes || echo no
-
-# install kvm
-sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-
-# add user to group. 이후 reboot 필요
-sudo adduser `id -un` libvirt
-sudo adduser `id -un` kvm
-
-# validation
-virt-host-validate
 ```
 
 
