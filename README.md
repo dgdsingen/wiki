@@ -22,7 +22,6 @@
 - [shell](./shell.md)
 - [vim](./vim.md)
 - [vscode](./vscode.md)
-- [windows](./windows.md)
 # architect
 - [architect](./architect/architect.md)
 - [design-principle](./architect/design-principle.md)
@@ -31,6 +30,7 @@
 - [aws](./aws/aws.md)
 - [certified-cloud-practitioner](./aws/certified-cloud-practitioner.md)
 - [solutions-architect-associate](./aws/solutions-architect-associate.md)
+- [sysops-administrator-associate](./aws/sysops-administrator-associate.md)
 # career
 - [resume](./career/resume.md)
 # collaboration
@@ -67,13 +67,13 @@
 - [idp](./iam/idp.md)
 - [keycloak](./iam/keycloak.md)
 - [okta](./iam/okta.md)
-# linux
-- [linux](./linux/linux.md)
-- [lubuntu-20.04](./linux/lubuntu-20.04.md)
-# mac
-- [mac](./mac/mac.md)
 # network
 - [network](./network/network.md)
 - [open-api](./network/open-api.md)
 - [web-server](./network/web-server.md)
 - [web](./network/web.md)
+# os
+- [linux](./os/linux.md)
+- [lubuntu-20.04](./os/lubuntu-20.04.md)
+- [mac](./os/mac.md)
+- [windows](./os/windows.md)

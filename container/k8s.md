@@ -45,7 +45,7 @@ sudo dpkg -i minikube_latest_amd64.deb
 
 **minikube config** 
 
-> Linux kvm2 설정은 [linux.md](../linux/linux.md) 참조
+> Linux kvm2 설정은 [linux.md](../os/linux.md) 참조
 
 ```sh
 # linux
