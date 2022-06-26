@@ -37,7 +37,17 @@ java 8 update 191 이상에서는 아래 옵션을 사용할 수 있다. host의
 
 
 
-## Heap Analyze
+## Analyze
+
+> [jvmtop](https://github.com/patric-r/jvmtop) : top-like, displays JVM internal metrics
+>
+> [jvm-mon](https://github.com/ajermakovics/jvm-mon) : Console based JVM monitoring
+>
+> [jcmd](https://docs.oracle.com/javase/9/tools/jcmd.htm#JSWOR743) : send diagnostic command requests to a running JVM
+>
+> [Java Process 메모리 추적기](https://www.whatap.io/ko/blog/57/) 
+>
+> [Java Native Memory Tracking](https://homoefficio.github.io/2020/04/09/Java-Native-Memory-Tracking/) 
 
 ### Dump
 
