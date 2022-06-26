@@ -174,6 +174,16 @@ pm uninstall -k --user 0 com.xiaomi.finddevice
 
 
 
+# Issues
+
+## Redmi Note 9S MIUI 12 EU ROM Issues
+
+- 긴급재난문자 안옴
+- 차단해도 문자옴
+- Widevine L3
+
+
+
 # References
 
 - [MIUI Fastboot Roms](https://c.mi.com/oc/miuidownload/detail?guide=2) 

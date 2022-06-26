@@ -37,6 +37,29 @@ OFF
 
 
 
+## Headless Chrome
+
+```sh
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --no-sandbox --disable-setuid-sandbox --disable-gpu --hide-scrollbars --disable-web-security --print-to-pdf=C:\Users\dgdsi\Downloads\t.pdf --window-size=1280,15000 https://www.test.com
+```
+
+
+
+## Extensions
+
+- https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb?hl=ko
+- https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ko
+- https://chrome.google.com/webstore/detail/imacros-for-chrome/cplklnmnlbnpmjogncfgfijoopmnlemp?hl=ko
+- https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg?hl=ko
+- https://chrome.google.com/webstore/detail/save-to-google-drive/gmbmikajjgmnabiglmofipeabaddhgne?hl=ko
+- https://chrome.google.com/webstore/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj?hl=ko
+- https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj?hl=ko
+- https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=ko
+- https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=ko
+- https://chrome.google.com/webstore/detail/accessibility-insights-fo/pbjjkligggfmakdaogkfomddhfmpjeni?hl=ko
+
+
+
 # Chrome OS
 
 ## OpenVPN
