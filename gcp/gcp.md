@@ -191,6 +191,23 @@ Image --> Instance_Template
 
 
 
+## Serial Console
+
+> https://cloud.google.com/compute/docs/troubleshooting/troubleshooting-using-serial-console
+
+Disk 용량이 full 차는 등의 이슈로 VM에 SSH 접속이 되지 않는 경우, VM을 Stop 후 Edit 해서 Serial Console 옵션을 켜고 Start Script에 아래 내용을 추가한다. 
+
+```sh
+#!/bin/bash
+adduser user
+echo user:password | chpasswd
+usermod -aG google-sudoers serial
+```
+
+이마저도 안되면 원본 VM의 disk snapshot을 뜬 다음, 임시 VM 만들어서 Additional disk로 snapshot 넣은 뒤 용량 확보하고 다시 snapshot 떠서 원본 vm의 boot disk로 넣어주자.
+
+
+
 # Cloud Functions
 
 ```sh
