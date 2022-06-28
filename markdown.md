@@ -210,6 +210,8 @@ title Pie Chart
 > > [Typora: Change Width of Writing Area](https://support.typora.io/Width-of-Writing-Area/) 
 > >
 > > [Typora: Draw Diagrams With Markdown](https://support.typora.io/Draw-Diagrams-With-Markdown/) 
+> >
+> > [Mermaid Diagram Syntax](https://mermaid-js.github.io/mermaid/#/) 
 >
 > [Milkdown](https://milkdown.dev/) 
 >
