@@ -21,6 +21,8 @@
 > [AWS, Azure, GCP 서비스 비교](https://cloud.google.com/free/docs/aws-azure-gcp-service-comparison?hl=ko) 
 >
 > [The Cloud Girl](https://thecloudgirl.dev/) 
+>
+> [SLA](https://cloud.google.com/terms/sla) 
 
 
 
