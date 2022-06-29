@@ -621,10 +621,10 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 #### k8s pod 비정상 종료
 
-- Query: `count by(container, reason) (kube_pod_container_status_terminated_reason{reason!="Completed"})` 
+- Query: `count by(pod, reason) (kube_pod_container_status_terminated_reason{reason!="Completed"})` 
     - 이 쿼리만 넣으면 현재 살아있는 container가 error로 restart만 1회 되고 계속 살아있는 경우는 잡아내지 못한다. 그래서 아래와 같이  restart 횟수와 join 해주는 쿼리를 추가한다.
 
-- Query: `sum by (container, pod, reason) (kube_pod_container_status_last_terminated_reason{reason!="Completed", namespace!~"kube-system|prometheus|default|whatap-monitoring", pod!="", container!~"POD|"}) * on (pod,container) group_left sum by (container, pod) (rate(kube_pod_container_status_restarts_total{reason!="Completed", namespace!~"kube-system|prometheus|default|whatap-monitoring", pod!="", container!~"POD|"}[30s])) > 0` 
+- Query: `sum by (pod, reason) (kube_pod_container_status_last_terminated_reason{reason!="Completed", namespace!~"kube-system|prometheus|default|whatap-monitoring", pod!="", container!~"POD|"}) * on (pod) group_left sum by (pod) (rate(kube_pod_container_status_restarts_total{reason!="Completed", namespace!~"kube-system|prometheus|default|whatap-monitoring", pod!="", container!~"POD|"}[30s])) > 0` 
 
 
 
