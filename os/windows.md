@@ -310,6 +310,8 @@ pause
 
 ## Install
 
+> [Install WSL using powershell](https://github.com/Microsoft/windows-dev-box-setup-scripts/blob/master/scripts/WSL.ps1) 
+
 1. [제어판 - 프로그램 - Windows 기능 켜기/끄기]에서 [Linux용 Windows 하위 시스템] 활성화
 2. Microsoft Store에서 Ubuntu를 찾아 설치
 
@@ -1018,7 +1020,6 @@ del /Q C:\*.log
 - [Windows 10 : 3D 개체 폴더 삭제](https://prolite.tistory.com/1138) 
 - [Windows 10 : Confirm Digital License](https://answers.microsoft.com/ko-kr/windows/forum/windows_10-windows_install/%EC%9C%88%EB%8F%84%EC%9A%B0/496b2d47-ff09-4f53-a8c5-b7c5470bbc9d) 
 - [Remove installed Enterprise Policy](https://malwaretips.com/blogs/installed-enterprise-policy-removal) 
-- [Install WSL using powershell](https://github.com/Microsoft/windows-dev-box-setup-scripts/blob/master/scripts/WSL.ps1) 
 - [윈도우10 안전모드 부팅 F8부팅 2가지 방법](https://gbworld.tistory.com/1162) 
 - [GitHub - microsoft/terminal: The new Windows Terminal, and the original Windows console host -- all in the same place!](https://github.com/microsoft/terminal) 
 - [Hyper-V - 우분투 서버 18.04 설치](https://psychoria.tistory.com/657) 
