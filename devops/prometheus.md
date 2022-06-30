@@ -656,9 +656,26 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 ## Datasource: Google Cloud Monitoring
 
+### External/Internal 구분
+
 default dashboard의 Load Balancing에 데이터가 나오지 않는 경우가 있다. 
 
 Query로 들어가서 Metric name을 잘 보면 분명 같은 이름인데 External/Internal 용이 나누어져 있다. 
 
 Metric name을 External/Internal에 맞게 잘 선택한 뒤 Filter: resource.type = internal_tcp_lb_rule과 같이 Filter 부분도 맞춰주면 데이터가 잘 보인다.
 
+### Legend에서 Metric, Project 제거하기
+
+Legent에 Metric, Project가 앞에 붙어서 너무 길게 나오는 경우가 있다. 
+
+ex) Cloud SQL CPU Utilization: `cloudsql.googleapis.com/database/cpu/utilization gcp-dev-test-id:sql-dev-test-mysql` 
+
+아래와 같이 필요한 부분만 보여주도록 설정한다.
+
+- Transform: `Labels to fields` 
+    - Mode: `Columns` 
+    - Labels: `resource.label.database_id` 
+    - Value field name: `resource.label.database_id` 
+- Transform: `Rename by regex` 
+    - Match: `(gcp-dev-test-id:)` 
+    - Replace: ` ` 
