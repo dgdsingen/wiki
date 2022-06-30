@@ -150,6 +150,14 @@ gcloud compute url-maps edit LB_NAME --region=asia-northeast3 --project PROJECT_
 
 
 
+## SSL/TLS Cert 적용
+
+Public DNS에서 LB의 IP를 A 레코드로 넣은 뒤에 LB에서 해당 도메인의 Google Managed SSL/TLS Cert가 적용된다.
+
+다만 한번 해보니 Provisioning에 40분 정도, Provisioning이 완료되어도 실제 인증서가 완전히 적용되기까지 총 45분 정도가 소요된다.
+
+
+
 # VM
 
 VM Linux 안에서 혹시나 잘못해서 방화벽으로 22번 포트를 막아 ssh 접속이 불가능해졌을때, 아래와 같이 방화벽 해제하는 스크립트를 startup-script로 추가해준다.
