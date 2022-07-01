@@ -86,7 +86,11 @@
 
 
 # References
-- [MS SRE](https://docs.microsoft.com/ko-kr/learn/modules/intro-to-site-reliability-engineering/) 
-- [Google SRE](https://landing.google.com/sre/) 
-- [네이버 검색의 SRE 시스템](https://d2.naver.com/helloworld/2047663) 
-- [네이버 검색의 스마트한 경보 시스템](https://m.blog.naver.com/naver_search/221217634238) 
+> [MS SRE](https://docs.microsoft.com/ko-kr/learn/modules/intro-to-site-reliability-engineering/) 
+>
+> [Google SRE](https://landing.google.com/sre/) 
+>
+> [네이버 검색의 SRE 시스템](https://d2.naver.com/helloworld/2047663) 
+>
+> [네이버 검색의 스마트한 경보 시스템](https://m.blog.naver.com/naver_search/221217634238) 
+
