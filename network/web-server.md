@@ -64,6 +64,17 @@ sudo vi /etc/crontab
 sudo service cron restart
 ```
 
+```sh
+# get ssl certificate with DNS challenge
+sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -m dgdsingen@gmail.com -d test.com
+
+# 이후 나오는 challenge 값을 복사해서 _acme-challenge.test.com DNS TXT 레코드로 등록하고 Enter
+
+# certificate, private key
+sudo cat /etc/letsencrypt/live/test.com/fullchain.pem
+sudo cat /etc/letsencrypt/live/test.com/privkey.pem
+```
+
 ```nginx
 # http2 적용
 sudo vi /etc/nginx/sites-enabled/default
