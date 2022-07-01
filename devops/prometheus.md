@@ -654,6 +654,14 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 
 
+#### mysql slow queries
+
+- Query: 
+    - `changes(mysql_global_status_slow_queries[$__rate_interval])` 
+    - `changes(mysql_global_status_slow_queries{instance="$host"}[$__rate_interval])` 
+
+
+
 ## Datasource: Google Cloud Monitoring
 
 ### External/Internal 구분
@@ -679,3 +687,4 @@ ex) Cloud SQL CPU Utilization: `cloudsql.googleapis.com/database/cpu/utilization
 - Transform: `Rename by regex` 
     - Match: `(gcp-dev-test-id:)` 
     - Replace: ` ` 
+

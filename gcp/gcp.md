@@ -344,6 +344,18 @@ wait # for parallel jobs
 
 
 
+## MySQL: Turn on slow query log
+
+> https://cloud.google.com/community/tutorials/stackdriver-monitor-slow-query-mysql
+
+아래 flags 추가
+
+- log_output: `FILE` 
+- slow_query_log: `on` 
+- long_query_time: `1` 
+
+
+
 # GKE
 
 ## Create Cluster
