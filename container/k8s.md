@@ -601,6 +601,62 @@ sleep 10
 
 
 
+# HPA
+
+> https://kubernetes.io/ko/docs/tasks/run-application/horizontal-pod-autoscale/
+
+autoscaling v1에서는 CPU 기반 HPA가 지원된다.
+
+```yaml
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: test-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: test-deploy
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+```
+
+
+
+Memory 기반 HPA를 사용하려면  autoscaling 버전을 올려야 한다.
+
+```yaml
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: test-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: test-deploy
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+```
+
+
+
+
+
 # Tools
 
 > [helm](https://helm.sh/) : package manager
