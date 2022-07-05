@@ -340,6 +340,8 @@ gsutil iam ch "serviceAccount:${SA}:objectAdmin" gs://sqldump-test
 # export database
 gcloud sql export sql mysql-test gs://sqldump-test/test.gz --database=test --offload --project project-test-id &
 wait # for parallel jobs
+
+# 한 DB에 한번에 1개의 작업밖에 하지 못하니 여러 DB에 작업할때는 병렬로, 한 DB에 여러 작업을 할 때는 직렬로.
 ```
 
 
