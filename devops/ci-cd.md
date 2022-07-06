@@ -318,7 +318,7 @@ services:
 ### Jenkins pull from GitLab
 
 - Jenkins > Jenkins 관리 > Manage Credentials > Jenkins > Global Credentials > Add Credentials
-    - 에서 Username with password 타입을 선택하여, GitLab 계정의 ID/PW 입력
+    - 에서 Username with password 타입을 선택하여, GitLab 계정의 ID/PW 입력 (PW에 GitLab API Key Token값을 넣는다)
 - Jenkins > Project 선택 > 구성 > 소스 코드 관리 > Git > URL, Credentials 추가
     - Credentials에서 앞서 미리 만든 Username with password 타입 Credential을 선택한다. 
 - 이제 GitLab에서 Push 해서 Webhook으로 Jenkins Build가 실행되든, Jenkins에서 Build Now 하든 git pull을 받아오게 된다. 
@@ -350,7 +350,7 @@ services:
         ```
 - AWS > CodeDeploy > 애플리케이션 > 애플리케이션 생성
   
-    - 배포 그룹 생성 > 서비스 역할 ARN에 IAM에서 만든 Role ARN 입력 
+    - 배포 그룹 생성 > 서비스 역할 ARN에 IAM에서 만든 Role ARN 입력
 - Jenkins > Jenkins 관리 > 플러그인 관리 > AWS CodeDeploy Plugin 설치
 - Jenkins > Project 선택 > 구성 > 빌드 후 조치 > Deploy an application to AWS CodeDeploy 추가
     - AWS CodeDeploy Application Name : AWS > CodeDeploy > 애플리케이션 > 애플리케이션 이름
