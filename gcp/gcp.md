@@ -346,6 +346,39 @@ wait # for parallel jobs
 
 
 
+## Scaling
+
+```sh
+#!/bin/bash
+
+echo "Start at $(date +%Y-%m-%dT%H:%M:%S)"
+gcloud sql instances list
+
+# 실제 수행해보니 DB별로 약 5분씩 걸림
+# cpu 6 core, memory 38GB => cpu 12 core, memory 76GB
+gcloud sql instances patch sql-dev-test-01 --cpu 12 --memory 76GB >> "${LOG}" 2>&1 &
+# cpu 8 core, memory 28GB => cpu 16 core, memory 56GB
+gcloud sql instances patch sql-dev-test-02 --cpu 16 --memory 56GB >> "${LOG}" 2>&1 &
+# cpu 4 core, memory 28GB => cpu 8 core, memory 52GB (8 core의 최대치인 52GB로 설정)
+gcloud sql instances patch sql-dev-test-3 --cpu 8 --memory 52GB >> "${LOG}" 2>&1 &
+# storage 80GB => 120GB
+gcloud sql instances patch sql-dev-test-04 --storage-size=120GB >> "${LOG}" 2>&1 &
+
+wait
+
+echo "End at $(date +%Y-%m-%dT%H:%M:%S)"
+gcloud sql instances list
+```
+
+```sh
+export LOG="patch-sql-instances.$(date +%Y-%m-%dT%H:%M:%S).log"
+touch "${LOG}"
+nohup ./patch-sql-instances.sh > "${LOG}" 2>&1 &
+tail -f "${LOG}"
+```
+
+
+
 ## MySQL: Turn on slow query log
 
 > https://cloud.google.com/community/tutorials/stackdriver-monitor-slow-query-mysql
