@@ -348,6 +348,8 @@ wait # for parallel jobs
 
 ## Scaling
 
+`patch-sql.sh` 
+
 ```sh
 #!/bin/bash
 
@@ -370,10 +372,12 @@ echo "End at $(date +%Y-%m-%dT%H:%M:%S)"
 gcloud sql instances list
 ```
 
+`run.sh` 
+
 ```sh
-export LOG="patch-sql-instances.$(date +%Y-%m-%dT%H:%M:%S).log"
+export LOG="patch-sql-$(date +%Y-%m-%dT%H:%M:%S).log"
 touch "${LOG}"
-nohup ./patch-sql-instances.sh > "${LOG}" 2>&1 &
+nohup ./patch-sql.sh > "${LOG}" 2>&1 &
 tail -f "${LOG}"
 ```
 
