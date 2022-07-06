@@ -328,12 +328,17 @@ services:
 - AWS > IAM > 역할 > 역할 만들기
     - AWS 서비스 > CodeDeploy
     - AWS 서비스 > EC2 > AmazonEC2RoleforAWSCodeDeploy
+    
 - AWS > S3 > 버킷 > 버킷 만들기
+
 - AWS > EC2 > ALB, Auto Scaling Group 생성
   
-    - AmazonEC2RoleforAWSCodeDeploy 롤을 적용해준다
+    - `AmazonEC2RoleforAWSCodeDeploy` 롤을 적용해준다
+    - 만약 CodeDeploy 대상 그룹을 ASG가 아니라 EC2로 할 것이라면 EC2 대상 Role로 AWSCodeDeployRole를 만들고 EC2에 해당 롤을 부여한다. 또한 DownloadBundle 과정에서 S3로 접속하여 zip 파일을 받아와야 하니 AmazonS3ReadOnlyAccess 역할도 부여해준다.
+        - 참조: https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/getting-started-create-service-role.html
+    
 - AWS > EC2 > 인스턴스 > 연결
-    - [CodeDeploy Agent 설치](https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html)   
+    - [CodeDeploy Agent 설치](https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html) 
       
         ```sh
         sudo apt update; sudo apt install -y ruby-full wget
@@ -347,21 +352,33 @@ services:
         sudo ./install auto > /tmp/logfile
         
         sudo service codedeploy-agent status
+        # codedeploy-agent 로그는 /var/log/aws/codedeploy-agent 에서 확인
         ```
+    
 - AWS > CodeDeploy > 애플리케이션 > 애플리케이션 생성
   
     - 배포 그룹 생성 > 서비스 역할 ARN에 IAM에서 만든 Role ARN 입력
+    
 - Jenkins > Jenkins 관리 > 플러그인 관리 > AWS CodeDeploy Plugin 설치
+
+    - plugin 설치 실패하는 경우 https://plugins.jenkins.io/aws-java-sdk/#releases 에서 다운받아 수동으로 설치한다. [Jira - Jenkins 연동](#Jira - Jenkins 연동) 부분 참조
+
 - Jenkins > Project 선택 > 구성 > 빌드 후 조치 > Deploy an application to AWS CodeDeploy 추가
-    - AWS CodeDeploy Application Name : AWS > CodeDeploy > 애플리케이션 > 애플리케이션 이름
-    - AWS CodeDeploy Deployment Group : AWS > CodeDeploy > 애플리케이션 > 배포 그룹 이름
-    - AWS CodeDeploy Deployment Config : AWS > CodeDeploy > 배포 구성 > CodeDeployDefault.OneAtATime 등
-    - AWS Region : AP_NORTHEAST_2
-    - S3 Bucket : AWS > S3 > 버킷 > 버킷 이름
+    - AWS CodeDeploy Application Name : AWS > CodeDeploy > 애플리케이션 > CodeDeploy에서 생성한 애플리케이션 이름
+    - AWS CodeDeploy Deployment Group : AWS > CodeDeploy > 애플리케이션 > CodeDeploy에서 생성한 배포 그룹 이름
+    - AWS CodeDeploy Deployment Config : AWS > CodeDeploy > 배포 구성 > `CodeDeployDefault.OneAtATime` 등
+    - AWS Region : `AP_NORTHEAST_2` 
+    - S3 Bucket : AWS > S3 > 버킷 > CodeDeploy 용으로 생성한 버킷 이름
     - Use Access/Secret keys : AWS Access Key, AWS Secret Key in aws credentials
         - 이것보단 Use temporary credentials : arn:aws:iam::1234567890:role/CI-DEV-CodeDeploy 와 같이 Role을 사용하는게 더 좋다. 
+
 - GitLab > Repository에 [appspec.yml](aws/code-deploy/appspec.yml), [scripts](aws/code-deploy/scripts) 추가
+
 - 이제 Jenkins에서 Build 후에 Repository 전체를 zip으로 묶어 S3 버킷에 업로드하고 CodeDeploy가 트리거링되며 appspec.yml 실행됨
+
+
+
+> 만약 CodeDeploy에서 BlockTraffic이 너무 오래 걸린다면 EC2 > Target Group > Attribute > Edit > Deregistration delay 값을 낮춰준다.
 
 
 
