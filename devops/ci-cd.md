@@ -1,6 +1,18 @@
 # Nexus
 
-- Nexus 3.x admin password 초기화
+## Install
+
+> https://hub.docker.com/r/sonatype/nexus3/
+
+```sh
+sudo docker run -d -p 8081:8081 --name nexus -v /home/ubuntu/nexus-data:/nexus-data --restart unless-stopped sonatype/nexus3
+```
+
+Admin Password는 `/nexus-data/admin.password` 파일을 참조한다.
+
+
+
+## Nexus 3 admin password 초기화
 
 ```sh
 docker exec -it -u 0 containerID bash
