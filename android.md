@@ -24,16 +24,16 @@ pip install jupyterlab
 - 앱 자동시작
     - 설정 > 앱 > 앱 관리 > 권한 > 자동 시작
     - 보안 > 앱 관리 > 권한 > 자동 시작
-    - 내 기기 찾기, 어시스턴트, 카카오뱅크, 카카오톡, 캘린더, 피트니스, Chrome, FolderSync Pro, Gmail, Google 한국어 입력기, KB국민카드, Vanced microG
+    - 내 기기 찾기, 어시스턴트, 카카오뱅크, 카카오톡, 캘린더, 피트니스, Chrome, FolderSync Pro, Gmail, Google 한국어 입력기, KB국민카드
 - 앱 잠금
     - 멀티 태스킹 > Long Click > 앱 잠금
     - 보안 > 설정 > 속도 향상 > 앱 잠금
-    - 어시스턴트, Vanced microG, Gmail, 피트니스, Chrome, 카카오뱅크, 캘린더, KB국민카드, 카카오톡
+    - 어시스턴트, Gmail, 피트니스, Chrome, 카카오뱅크, 캘린더, KB국민카드, 카카오톡
 - MIUI 배터리 절약
     - 설정 > 앱 > 앱 관리 > 앱 선택
     - 설정 > 배터리 & 성능 > 설정 > 앱 배터리 절약
     - 백그라운드 앱 제한 : 뷰티포인트, AhnLab V3 Mobile Plus, ISP/페이북
-    - 제한 없음 : 어시스턴트, 카카오뱅크, 카카오톡, 캘린더, 피트니스, Chrome, KB국민카드, Gmail, Vanced microG
+    - 제한 없음 : 어시스턴트, 카카오뱅크, 카카오톡, 캘린더, 피트니스, Chrome, KB국민카드, Gmail
     - 여기서 "제한 없음"으로 설정하면 아래 배터리 최적화에서도 "최적화되지 않음"으로 설정된다.
 - 배터리 최적화
     - 노바 런처 > 위젯 > 액티비티 > 설정 > ManageApplications
