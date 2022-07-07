@@ -797,9 +797,19 @@ kubectl delete pod --field-selector=status.phase==Succeeded
 
 Pod가 바로 종료되어 버리면 Pod에 남아있던 트랜젝션이 그냥 끊어져서 문제가 될 수 있다. 그래서 AWS LB도 기본 300초 draining time이 있다.
 
-Pod에는 terminationGracePeriodSeconds 옵션이 있다. (기본값 30초) 다만 이 값은 Pod에 SIGTERM이 전달된 후, terminationGracePeriodSeconds를 기다려도 응답이 없으면 SIGKILL을 보내는 것이다.
+Pod에는 terminationGracePeriodSeconds 옵션이 있다. (기본값 30초)
 
-Pod에 SIGTERM 보내면 Pod의 PID 1번 Process가 받아 Process를 중지한다. 이후 livenessProbe로 Failure 체크를 한 뒤 정상 종료된게 맞다고 판단하면 비로소 Termination으로 빠지게 된다.
+다만 이 값은 "Pod야 네게 가는 트래픽을 끊고 30초간 기다렸다가 종료할테니 떠날 준비를 하렴"의 의미가 아니다.
+
+"Pod야 일단 SIGTERM 받고 알아서 종료해라. 30초 안에 안죽으면 내가 죽인다"에 가깝다.
+
+
+
+즉 일단 Pod에 SIGTERM이 전달한 후, terminationGracePeriodSeconds를 기다려도 응답이 없으면 SIGKILL을 보낸다.
+
+Pod에 SIGTERM이 전달되면 Pod의 PID 1번 Process가 받아 Process를 중지한다. (sh은 PID 1만 종료하고, bash는 child process에게도 SIGTERM을 넘겨준다고 한다)
+
+이후 livenessProbe로 Failure 체크를 한 뒤 정상 종료된게 맞다고 판단하면 비로소 Termination으로 빠지게 된다.
 
 
 
