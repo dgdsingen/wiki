@@ -799,7 +799,7 @@ Pod가 바로 종료되어 버리면 Pod에 남아있던 트랜젝션이 그냥 
 
 Pod에는 terminationGracePeriodSeconds 옵션이 있다. (기본값 30초) 다만 이 값은 Pod에 SIGTERM이 전달된 후, terminationGracePeriodSeconds를 기다려도 응답이 없으면 SIGKILL을 보내는 것이다.
 
-Pod에 SIGTERM 보내면 Pod의 PID 1번 Process가 받아 Process를 중지한다. 이후  livenessProbe로 Failure 체크를 한 뒤 정상 종료된게 맞다고 판단하면 비로소 Termination으로 빠지게 된다.
+Pod에 SIGTERM 보내면 Pod의 PID 1번 Process가 받아 Process를 중지한다. 이후 livenessProbe로 Failure 체크를 한 뒤 정상 종료된게 맞다고 판단하면 비로소 Termination으로 빠지게 된다.
 
 
 
