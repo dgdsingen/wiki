@@ -168,7 +168,6 @@ pm uninstall -k --user 0 com.xiaomi.finddevice
     - 위 unroot zip들을 차례대로 flashing
 - Install Magisk in recovery
     - reboot 후 Magisk Manager 실행하고 각 금융앱, V3 등에서 Magisk Hide 처리하면 금융앱 사용이 가능해진다.
-    - Youtube Vanced - Magisk Repo
     - Call Recorder - SKVALEX
 - 이후 시스템 및 애플리케이션 설정
 
