@@ -104,21 +104,37 @@ Service 파일 생성
 >
 > systemd unit 파일 경로: `/etc/systemd/system/*.service` 
 
+
+
+`/etc/systemd/system/test.service` 
+
 ```sh
 [Unit]
-Description=Test Daemon
-After=after-test.service
-Requires=after-test.service
+Description=test
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 User=tester
 Group=tester
 Type=simple
-ExecStart=/usr/local/bin/example-daemon.sh
+#Type=forking # chile process를 띄우는 경우
+WorkingDirectory=/usr/local/bin # 쉘 파일 내에서 ./과 같이 상대경로를 사용하는 경우 기재
+ExecStart=/usr/local/bin/test.sh
 Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
+```
+
+
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl start test
+sudo systemctl enable test
+sudo systemctl status test
 ```
 
 
