@@ -96,6 +96,33 @@ sudo update-grub
 
 # Process
 
+## Systemd
+
+Service 파일 생성
+
+> https://kim-dragon.tistory.com/202
+>
+> systemd unit 파일 경로: `/etc/systemd/system/*.service` 
+
+```sh
+[Unit]
+Description=Test Daemon
+After=after-test.service
+Requires=after-test.service
+
+[Service]
+User=tester
+Group=tester
+Type=simple
+ExecStart=/usr/local/bin/example-daemon.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+
 ## chkconfig
 
 일반적으로 start(), stop() 과 case 구문으로 init scripts를 만들어 데몬을 효율적으로 관리 할수 있다.
