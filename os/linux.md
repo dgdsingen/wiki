@@ -100,7 +100,9 @@ sudo update-grub
 
 Service 파일 생성
 
-> https://kim-dragon.tistory.com/202
+> [systemd service](https://velog.io/@markyang92/systemd-timer) 
+>
+> [systemd 서비스 unit파일 작성에서 했던 실수](https://springboot.cloud/16) 
 >
 > systemd unit 파일 경로: `/etc/systemd/system/*.service` 
 
