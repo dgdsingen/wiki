@@ -248,7 +248,31 @@ kex_exchange_identification: read: Connection reset by peer
 Jan 20 06:19:51 vm-test sshd[1234567]: refused connect from 172.31.1.2 (172.31.1.2)
 ```
 
-그럴 때는 sshd 서버 쪽의 hosts.allow, hosts.deny 설정을 살펴보자.
+그럴 때는 sshd 서버를 `-d` 옵션 추가해서 debug 모드로 켠 뒤 접속을 해보면 로그를 확인해볼 수 있다.
+
+
+
+접속 실패 로그로 `no matching host key type found. their offer: ssh-rsa` 가 뜬다면 `HostKeyAlgorithms +ssh-rsa` 옵션을 추가한다.
+
+접속 실패 로그로 `signature algorithm ssh-rsa not in pubkey accepted algorithms` 가 뜬다면 `PubkeyAcceptedKeyTypes +ssh-rsa` 옵션을 추가한다.
+
+ssh-rsa 옵션은 보안 이슈로 default 미사용 처리된 알고리즘이라고 한다. 그러나 Android FX 앱에서는 해당 옵션으로만 sshd 접속이 가능하여 Termux sshd 설정을 아래와 같이 수정해주니 잘 됨.
+
+```sh
+PrintMotd yes
+#ChallengeResponseAuthentication no
+PubkeyAuthentication yes
+PasswordAuthentication no
+Subsystem sftp /data/data/com.termux/files/usr/libexec/sftp-server
+#Ciphers aes128-cbc,aes192-cbc,aes256-cbc
+KexAlgorithms +diffie-hellman-group1-sha1
+HostKeyAlgorithms +ssh-rsa
+PubkeyAcceptedKeyTypes +ssh-rsa
+```
+
+
+
+방화벽을 열었는데도 접속이 아예 차단된다면 hosts.allow, hosts.deny 설정도 살펴보자.
 
 ```sh
 # /etc/hosts.allow
