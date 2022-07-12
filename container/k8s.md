@@ -471,6 +471,37 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 
 
+## /etc/hosts 항목 추가
+
+> https://kubernetes.io/ko/docs/tasks/network/customize-hosts-file-for-pods/
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostaliases-pod
+spec:
+  restartPolicy: Never
+  hostAliases:
+  - ip: "127.0.0.1"
+    hostnames:
+    - "foo.local"
+    - "bar.local"
+  - ip: "10.1.2.3"
+    hostnames:
+    - "foo.remote"
+    - "bar.remote"
+  containers:
+  - name: cat-hosts
+    image: busybox:1.28
+    command:
+    - cat
+    args:
+    - "/etc/hosts"
+```
+
+
+
 # Deployment
 
 > https://kubernetes.io/ko/docs/concepts/workloads/controllers/deployment
