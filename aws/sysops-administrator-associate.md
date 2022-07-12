@@ -3,7 +3,7 @@
 # Guides
 
 - [x] Certification Overview
-- [ ] Exam Guide
+- [x] Exam Guide
 - [ ] Sample Questions
 - [ ] 시험 후기
 
