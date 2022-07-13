@@ -348,6 +348,7 @@ services:
     - [CodeDeploy Agent 설치](#CodeDeploy) 
 - AWS > CodeDeploy > 애플리케이션 > 애플리케이션 생성
     - 배포 그룹 생성 > 서비스 역할 ARN에 IAM에서 만든 Role ARN 입력
+    - 잠깐 트래픽이 끊겨도 상관없는 DEV 환경이고 EC2가 고정되어 있으며 in-place 배포를 한다면 Load Balancer 옵션을 빼버리자. BlockTraffic, AllowTraffic 등의 event가 없어져 빠르게 배포된다.
 - Jenkins > Jenkins 관리 > 플러그인 관리 > AWS CodeDeploy Plugin 설치
     - plugin 설치 실패하는 경우 https://plugins.jenkins.io/aws-java-sdk/#releases 에서 다운받아 수동으로 설치한다. [Jira - Jenkins 연동](#Jira - Jenkins 연동) 부분 참조
 - Jenkins > Project 선택 > 구성 > 빌드 후 조치 > Deploy an application to AWS CodeDeploy 추가
