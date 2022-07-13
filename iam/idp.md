@@ -62,7 +62,17 @@
 
 # LDAP
 
+> https://directory.apache.org/studio/
+
 ## FreeIPA
+
+> https://github.com/freeipa/freeipa-container
+>
+> https://hub.docker.com/r/freeipa/freeipa-server/tags
+>
+> [FreeIPA Install Docker in Ubuntu 18.04](https://lasel.kr/archives/576) 
+>
+> [Radius – Ldap 연동](https://lasel.kr/archives/584) 
 
 우선 LDAP에서 사용할 도메인을 미리 등록해두자.
 
@@ -123,18 +133,6 @@ docker restart keycloak
     - Users DN: `cn=users,cn=accounts,dc=t,dc=com` 
     - Bind DN: `uid=admin,cn=users,cn=accounts,dc=t,dc=com` 
     - Bind Credential: `12345678` 
-
-
-
-**References:** 
-
-> https://github.com/freeipa/freeipa-container
->
-> https://hub.docker.com/r/freeipa/freeipa-server/tags
->
-> [FreeIPA Install Docker in Ubuntu 18.04](https://lasel.kr/archives/576) 
->
-> [Radius – Ldap 연동](https://lasel.kr/archives/584) 
 
 
 
