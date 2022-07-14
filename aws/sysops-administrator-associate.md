@@ -4,8 +4,10 @@
 
 - [x] Certification Overview
 - [x] Exam Guide
-- [ ] Sample Questions
-- [ ] 시험 후기
+- [x] Sample Questions
+- [x] 시험 후기
+    - [x] [AWS SysOps Administrator – Associate 취득 후기](https://mateon.tistory.com/55) 
+
 
 # Courses
 
@@ -13,8 +15,13 @@
     - [ ] [AWS Technical Essentials](https://explore.skillbuilder.aws/learn/course/1851/aws-technical-essentials) 
     - [ ] [AWS Certified SysOps Administrator - Associate Official Practice Question Set (SOA-C02 - Korean)](https://explore.skillbuilder.aws/learn/course/12556/aws-certified-sysops-administrator-associate-official-practice-question-set-soa-c02-korean) 
     - [ ] [Exam Prep: AWS Certified SysOps Administrator - Associate](https://explore.skillbuilder.aws/learn/course/9313/exam-prep-aws-certified-sysops-administrator-associate) 
-- [ ] [AWS SysOps Administrator Associate 2020](https://www.youtube.com/watch?v=KX_AfyrhlgQ) 
-- [ ] [Ultimate AWS Certified SysOps Administrator Associate 2022](https://www.udemy.com/course/ultimate-aws-certified-sysops-administrator-associate/) 
+- [ ] Youtube
+    - [ ] [AWS SysOps Administrator Associate 2020](https://www.youtube.com/watch?v=KX_AfyrhlgQ) 
+
+- [ ] Udemy
+    - [ ] [Ultimate AWS Certified SysOps Administrator Associate 2022](https://www.udemy.com/course/ultimate-aws-certified-sysops-administrator-associate/) 
+    - [ ] [AWS 공인 시스템 운영 관리자 – 어소시에이트 SOA-C02 연습문제](https://www.udemy.com/course/aws-soa-c02/) 
+
 
 # Documents
 
@@ -35,6 +42,7 @@
 
 # Exams
 
+- [ ] 공식 무료 샘플 랩 시험 (시험 예약 확정 메일 참조)
 - [ ] [Amazon AWS Certified SysOps Administrator - Associate Exam Practice Questions](https://www.examtopics.com/exams/amazon/aws-certified-sysops-administrator-associate/view/) 
 
 
