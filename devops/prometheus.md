@@ -448,6 +448,46 @@ Thanos를 Sidecar로 붙혀서 Prometheus HA 구성을 한다. kube-prometheus-s
 
 # Grafana
 
+## Dashboard
+
+### Sync
+
+> https://github.com/mpostument/grafana-sync
+
+dev, stg, prd 등 여러 환경의 grafana를 sync해야 하는 경우에 사용한다. 근데 실제 써보니 패널의 value type이 안맞는 등 다소 이슈가 있어 완벽하게 sync 되지는 않는다.
+
+우선 API key가 필요한데 grafana > configuration > API keys > Add API key > Role: Admin 으로 생성한다.
+
+```sh
+# datasources: prd > stg, dev
+./grafana-sync.exe pull-datasources --url http://grafana.prd.test.com --directory="datasources" --apikey="apikey-dev"
+./grafana-sync.exe push-datasources --url http://grafana.stg.test.com --directory="datasources" --apikey="apikey-stg"
+./grafana-sync.exe push-datasources --url http://grafana.dev.test.com --directory="datasources" --apikey="apikey-prd"
+
+# folders: prd > stg, dev
+./grafana-sync.exe pull-folders --url http://grafana.prd.test.com --directory="folders" --apikey="apikey-dev"
+./grafana-sync.exe push-folders --url http://grafana.stg.test.com --directory="folders" --apikey="apikey-stg"
+./grafana-sync.exe push-folders --url http://grafana.dev.test.com --directory="folders" --apikey="apikey-prd"
+
+# dashboards: prd > stg, dev
+./grafana-sync.exe pull-dashboards --url http://grafana.prd.test.com --directory="dashboards" --folderName="K8s" --apikey="apikey-dev"
+./grafana-sync.exe push-dashboards --url http://grafana.stg.test.com --directory="dashboards" --folderName="K8s" --apikey="apikey-stg"
+./grafana-sync.exe push-dashboards --url http://grafana.dev.test.com --directory="dashboards" --folderName="K8s" --apikey="apikey-prd"
+rm -r dashboards
+
+./grafana-sync.exe pull-dashboards --url http://grafana.prd.test.com --directory="dashboards" --folderName="Prometheus" --apikey="apikey-dev"
+./grafana-sync.exe push-dashboards --url http://grafana.stg.test.com --directory="dashboards" --folderName="Prometheus" --apikey="apikey-stg"
+./grafana-sync.exe push-dashboards --url http://grafana.dev.test.com --directory="dashboards" --folderName="Prometheus" --apikey="apikey-prd"
+rm -r dashboards
+
+./grafana-sync.exe pull-dashboards --url http://grafana.prd.test.com --directory="dashboards" --folderName="SQL" --apikey="apikey-dev"
+./grafana-sync.exe push-dashboards --url http://grafana.stg.test.com --directory="dashboards" --folderName="SQL" --apikey="apikey-stg"
+./grafana-sync.exe push-dashboards --url http://grafana.dev.test.com --directory="dashboards" --folderName="SQL" --apikey="apikey-prd"
+rm -r dashboards
+```
+
+
+
 ## Datasource: Prometheus
 
 ### Variables
