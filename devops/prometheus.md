@@ -654,6 +654,24 @@ sum(container_memory_working_set_bytes{pod="$pod",container!~"POD|"})
 
 
 
+#### k8s hpa replicas min
+
+- Query: `sort(sum(kube_horizontalpodautoscaler_spec_min_replicas{namespace!~"kube-system|default|prometheus|whatap-monitoring"}) by(horizontalpodautoscaler))` 
+
+#### k8s hpa replicas max
+
+- Query: `sort(sum(kube_horizontalpodautoscaler_spec_max_replicas{namespace!~"kube-system|default|prometheus|whatap-monitoring"}) by(horizontalpodautoscaler))` 
+
+#### k8s hpa metric cpu
+
+- Query: `sort(sum(kube_horizontalpodautoscaler_spec_target_metric{namespace!~"kube-system|default|prometheus|whatap-monitoring", metric_name="cpu", metric_target_type="utilization"}) by(horizontalpodautoscaler))` 
+
+#### k8s hpa metric memory
+
+- Query: `sort(sum(kube_horizontalpodautoscaler_spec_target_metric{namespace!~"kube-system|default|prometheus|whatap-monitoring", metric_name="memory", metric_target_type="utilization"}) by(horizontalpodautoscaler))` 
+
+
+
 #### mysql slow queries
 
 - Query: 
