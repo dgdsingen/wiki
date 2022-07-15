@@ -158,6 +158,8 @@ docker run --restart=unless-stopped
 ## BuildKit
 
 > https://docs.docker.com/develop/develop-images/build_enhancements/
+>
+> [BuildKit 장단점](https://github.com/start-k8s/study/issues/1) 
 
 BuildKit은 docker build v2로 생각하면 된다. docker 18.09 이상에서 Linux 컨테이너 빌드에만 적용된다.
 
