@@ -153,6 +153,23 @@ docker run --restart=unless-stopped
 
  
 
+# Build
+
+## BuildKit
+
+> https://docs.docker.com/develop/develop-images/build_enhancements/
+
+BuildKit은 docker build v2로 생각하면 된다. docker 18.09 이상에서 Linux 컨테이너 빌드에만 적용된다.
+
+기존 docker build는 각 레이어를 순차적으로 빌드하지만 BuildKit은 병렬로 처리하여 속도가 개선되며 또한 빌드 과정도 좀 더 가시성 있게 보여준다.
+
+```sh
+# docker build 호출시 DOCKER_BUILDKIT=1 환경변수만 호출해주면 BuildKit이 사용된다.
+DOCKER_BUILDKIT=1 docker build .
+```
+
+
+
 # Backup
 
 
