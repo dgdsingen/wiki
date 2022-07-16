@@ -856,6 +856,18 @@ kubectl cp (namespace) podname:dir/file /dir/file
 
 
 
+## CPU, Memory 강제로 거덜내기
+
+```sh
+# cpu 사용
+while true; do true; done
+
+# memory 사용
+dd if=/dev/zero of=/dev/shm/fill bs=1k count=1024k
+```
+
+
+
 # CKA (Certified Kubernetes Administrator)
 
 > https://kubernetes.io/ko/training/
