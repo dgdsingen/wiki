@@ -386,12 +386,49 @@ tail -f "${LOG}"
 ## MySQL: Turn on slow query log
 
 > https://cloud.google.com/community/tutorials/stackdriver-monitor-slow-query-mysql
+>
+> https://cloud.google.com/sdk/gcloud/reference/sql/instances/patch
+>
+> https://cloud.google.com/sql/docs/mysql/flags
 
-아래 flags 추가
+Cloud SQL Instance에 아래 Database Flags 추가
 
 - log_output: `FILE` 
 - slow_query_log: `on` 
 - long_query_time: `1` 
+
+대량 작업시 gcloud로 처리
+
+```sh
+# get db list
+gcloud sql instances list | awk -F' ' '{print $1}' | egrep -v 'NAME' | sort | tr '\n' ' '
+
+# patch
+#!/bin/bash
+for DB in sql-test-01 sql-test-02 sql-test-03; do
+  echo "DB: $DB"
+  gcloud sql instances describe $DB | yq '.settings.databaseFlags' > $DB.yml
+  echo "- name: log_output
+  value: FILE
+- name: slow_query_log
+  value: on
+- name: long_query_time
+  value: 1" >> $DB.yml
+  # yml 파일을 읽어 KEY=VAL,KEY=VAL 형식으로 변환한다.
+  # 기존에 log_output=TABLE, slow_query_log=off로 들어간 부분은 제거한다.
+  # innodb_buffer_pool_size=[0-9]* 부분은 innodb_buffer_pool_size 플래그 값을 default 값으로 대체하기 위함임. 만약 임의로 설정한 값을 유지하려면 이 부분을 제거한다.
+  DB_FLAGS=$(cat $DB.yml | sed 's/- name: //g' | sed 's/  value: /=/g' | tr '\n' ' ' | sed 's/ =/=/g' | sed 's/ /,/g' | sed 's/,$//g' | sed "s/'//g" | sed 's/log_output=TABLE//g' | sed 's/slow_query_log=off//g' | sed 's/innodb_buffer_pool_size=[0-9]*//g' | sed 's/,,/,/g')
+  echo "DB_FLAGS: $DB_FLAGS"
+  gcloud sql instances patch $DB --database-flags=$DB_FLAGS
+done
+
+# check results
+#!/bin/bash
+for DB in sql-test-01 sql-test-02 sql-test-03; do
+  echo "DB: $DB"
+  gcloud sql instances describe $DB | yq '.settings.databaseFlags'
+done
+```
 
 
 
