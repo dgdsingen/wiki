@@ -295,6 +295,30 @@ services:
 
 
 
+## Environment
+
+> https://www.jenkins.io/doc/pipeline/tour/environment/
+
+```groovy
+pipeline {
+  environment {
+    DOCKER_BUILDKIT = "1"
+  }
+}
+```
+
+위와 같이 Environment를 선언적으로 설정할 수도 있고, 아래와 같이 script 내에서 동적으로 설정할 수도 있다.
+
+```groovy
+script {
+  if (env.TARGET == "DEV") {
+    env.DOCKER_BUILDKIT = "1"
+  }
+}
+```
+
+
+
 # Pipeline
 
 ## GitLab - Jenkins 연동
