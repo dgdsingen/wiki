@@ -158,6 +158,24 @@ Public DNS에서 LB의 IP를 A 레코드로 넣은 뒤에 LB에서 해당 도메
 
 
 
+## Firewall
+
+> https://cloud.google.com/load-balancing/docs/https?hl=ko#firewall-rules
+>
+> https://cloud.google.com/load-balancing/docs/internal#firewall_rules
+>
+> https://cloud.google.com/load-balancing/docs/tcp?hl=ko#firewall-rules
+
+Internal TCP/UDP Load Balancing은 GCP Console > VPC network > Firewall 에서 target이 LB가 아닌 VM으로 적용해야 한다. Client => GFE(LB)로의 접근은 막을 수 없다. 즉
+
+- Client IP: 1.1.1.1
+- LB IP: 2.2.2.2
+- VM IP: 3.3.3.3
+- Firewall(Ingress Allow): source IP 1.1.1.1 => target IP 3.3.3.3
+- 일 때 1.1.1.1 => 2.2.2.2 => 3.3.3.3으로 접속 잘 된다. 즉 Firewall은 Client IP => VM IP로 되어 있지만 LB가 By-pass 해주기 때문에 Firewall은 위와 같이 걸면 된다.
+
+
+
 # VM
 
 VM Linux 안에서 혹시나 잘못해서 방화벽으로 22번 포트를 막아 ssh 접속이 불가능해졌을때, 아래와 같이 방화벽 해제하는 스크립트를 startup-script로 추가해준다.
