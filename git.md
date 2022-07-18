@@ -547,13 +547,15 @@ git switch branch_what_i_want
 ## Delete all commits
 
 ```sh
+rm -rf .git
+
 git init
+git add .
+git commit -m init
+
 git remote add origin git@github.com:user/repo
 
-git add .
-git commit -am init
-
-git push -f origin master
+git push --mirror -f
 ```
 
 ## Rename tag
