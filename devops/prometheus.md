@@ -18,13 +18,13 @@ git clone https://github.com/prometheus-community/helm-charts.git prometheus
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-helm install prometheus prometheus
+helm install prometheus prometheus -n prometheus
 ```
 
 이후 아래와 같은 service가 생성된다. 이 중 prometheus-server를 LB, DNS에 등록하여 접속 잘 되면 prometheus는 준비되었다.
 
 ```sh
-# k get svc | grep prometheus
+# k get svc -n prometheus
 prometheus-alertmanager         ClusterIP   100.64.36.125   <none>        80/TCP     51m
 prometheus-kube-state-metrics   ClusterIP   100.64.36.214   <none>        8080/TCP   51m
 prometheus-node-exporter        ClusterIP   100.64.36.114   <none>        9100/TCP   51m
@@ -120,7 +120,7 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
    ##
 -  extraArgs: {}
 +  extraArgs:
-+    'storage.tsdb.retention.size': "25GB"
++    'storage.tsdb.retention.size': "50GB"
  
      ## Prometheus server data Persistent Volume size
      ##
@@ -144,6 +144,11 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 +    requests:
 +      cpu: 1000m
 +      memory: 8Gi
+
+   ## Prometheus data retention period (default if not specified is 15 days)
+   ##
+-  retention: "15d"
++  retention: "30d"
 
    ## pushgateway resource requests and limits
    ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -181,6 +186,23 @@ Memory, Storage Size 는 주기적으로 발생하는 Compaction과 Index data �
 +        static_configs:
 +          - targets:
 +            - "child-prometheus:9090"
+```
+
+helm 설치
+
+```sh
+# chart 내용을 변경한 경우 반드시 update를 한번 해주자
+cd charts
+helm dep up prometheus
+
+# prometheus를 설치한다.
+helm install prometheus prometheus -n prometheus
+
+# 내용 변경시 update
+helm upgrade prometheus prometheus -n prometheus
+
+# 삭제
+helm uninstall prometheus -n prometheus
 ```
 
 
