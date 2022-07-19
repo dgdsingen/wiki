@@ -319,6 +319,12 @@ script {
 
 
 
+## docker plugin
+
+> https://www.jenkins.io/doc/book/pipeline/docker/
+
+
+
 # Pipeline
 
 ## GitLab - Jenkins 연동
