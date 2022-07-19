@@ -1424,6 +1424,12 @@ gcloud compute ssl-certificates delete cert-prd --region=asia-northeast3 --proje
 
 # Cloud Storage
 
+Bucket의 Encryption 방식이 CMEK, CSEK인 경우, 해당 Bucket의 Object들은 Cache-Control metadata가 설정되지 않는다.
+
+Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Control metadata 설정이 가능하다.
+
+
+
 ## gzip 압축 트랜스코딩
 
 Cloud Storage에 gzip 압축된 파일을 올려서 서비스하고 싶다면 아래와 같이 진행한다.
