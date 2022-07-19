@@ -1436,34 +1436,6 @@ Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Co
 
 
 
-### rsync
-
-> https://cloud.google.com/storage/docs/gsutil/commands/rsync
-
-GCS 모든 파일 다운로드 받고 mtime 갱신, 업로드, setmeta 후 삭제하는 스크립트
-
-`paths` 
-
-```sh
-gs://test/
-```
-
-`t.sh` 
-
-```sh
-#!/bin/bash
-
-for path in $(cat paths); do
-  gsutil -m rsync -r "${path}" .
-  find . -exec touch {} \;
-  gsutil -m rsync -x '.*\.sh$' -r . "${path}"
-  gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" "${path}**"
-  rm -rf $(ls | egrep -v '*.sh')
-done
-```
-
-
-
 ## gzip 압축 트랜스코딩
 
 Cloud Storage에 gzip 압축된 파일을 올려서 서비스하고 싶다면 아래와 같이 진행한다.
@@ -1554,6 +1526,34 @@ gsutil -m setmeta -h "${CACHE_CONTROL}" "gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_reso
 
 ```sh
 gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zip
+```
+
+
+
+### rsync
+
+> https://cloud.google.com/storage/docs/gsutil/commands/rsync
+
+GCS 모든 파일 다운로드 받고 mtime 갱신, 업로드, setmeta 후 삭제하는 스크립트
+
+`paths` 
+
+```sh
+gs://test/
+```
+
+`t.sh` 
+
+```sh
+#!/bin/bash
+
+for path in $(cat paths); do
+  gsutil -m rsync -r "${path}" .
+  find . -exec touch {} \;
+  gsutil -m rsync -x '.*\.sh$' -r . "${path}"
+  gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" "${path}**"
+  rm -rf $(ls | egrep -v '*.sh')
+done
 ```
 
 
