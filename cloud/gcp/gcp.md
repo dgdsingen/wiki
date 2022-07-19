@@ -1428,6 +1428,40 @@ Bucket의 Encryption 방식이 CMEK, CSEK인 경우, 해당 Bucket의 Object들�
 
 Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Control metadata 설정이 가능하다.
 
+만약 이미 Bucket을 CMEK, CSEK로 사용중이었다면 우선 Google Managed Key 방식으로 설정을 변경해준다.
+
+설정을 변경한 후부터 업로드하는 Object들은 이제 Google Managed Key 방식으로 암호화되며 Cache-Control metadata가 설정 가능해진다.
+
+그러나 기존에 존재하는 Object들은 CMEK, CSEK 등 기존 암호화 방식으로 존재하니 이들을 Google Managed Key 방식으로 바꾸려면 일괄 다운로드 & 업로드를 해야 한다. [rsync](#rsync) 를 참조하자.
+
+
+
+### rsync
+
+> https://cloud.google.com/storage/docs/gsutil/commands/rsync
+
+GCS 모든 파일 다운로드 받고 mtime 갱신, 업로드, setmeta 후 삭제하는 스크립트
+
+`paths` 
+
+```sh
+gs://test/
+```
+
+`t.sh` 
+
+```sh
+#!/bin/bash
+
+for path in $(cat paths); do
+  gsutil -m rsync -r "${path}" .
+  find . -exec touch {} \;
+  gsutil -m rsync -x '.*\.sh$' -r . "${path}"
+  gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" "${path}**"
+  rm -rf $(ls | egrep -v '*.sh')
+done
+```
+
 
 
 ## gzip 압축 트랜스코딩
@@ -1520,34 +1554,6 @@ gsutil -m setmeta -h "${CACHE_CONTROL}" "gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_reso
 
 ```sh
 gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zip
-```
-
-
-
-### rsync
-
-> https://cloud.google.com/storage/docs/gsutil/commands/rsync
-
-GCS 모든 파일 다운로드 받고 mtime 갱신, 업로드, setmeta 후 삭제하는 스크립트
-
-`paths` 
-
-```sh
-gs://test/
-```
-
-`t.sh` 
-
-```sh
-#!/bin/bash
-
-for path in $(cat paths); do
-  gsutil -m rsync -r "${path}" .
-  find . -exec touch {} \;
-  gsutil -m rsync -x '.*\.sh$' -r . "${path}"
-  gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" "${path}**"
-  rm -rf $(ls | egrep -v '*.sh')
-done
 ```
 
 
