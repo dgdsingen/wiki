@@ -1498,24 +1498,56 @@ gsutil -m setmeta -h "${CACHE_CONTROL}" "gs://nuxt${DEPLOY_BUCKET_POSTFIX}/_reso
 
 ## gsutil
 
-- VM에서 gsutil cp 등 write 작업시 `ResumableUploadAbortException: 403 Provided scope(s) are not authorized` 발생할 때. 2가지 방법이 있다.
-    1. VM API access scope 변경
-        - Stop VM instance
-        - Open VM instance details
-        - Press "Edit"
-        - Change Cloud API access scope--> "Allow full access to all cloud APIs"
-        - Start VM instance
-    2. VM에서 `gcloud init` 으로 cloud storage에 write 권한을 가진 계정으로 새로 로그인하면 된다.
+### VM에서 gsutil cp 등 write 작업시 `ResumableUploadAbortException: 403 Provided scope(s) are not authorized` 발생할 때
+
+2가지 방법이 있다.
+
+1. VM API access scope 변경
+    - Stop VM instance
+    - Open VM instance details
+    - Press "Edit"
+    - Change Cloud API access scope--> "Allow full access to all cloud APIs"
+    - Start VM instance
+2. VM에서 `gcloud init` 으로 cloud storage에 write 권한을 가진 계정으로 새로 로그인하면 된다.
 
 
 
-- Signed URL 만들기
-    - 참조: https://cloud.google.com/storage/docs/access-control/signing-urls-with-helpers
-    - IAM & Admin > Service Accounts > 계정 선택 > KEYS > ADD KEY > Create new key > JSON > CREATE
-    - 다운로드된 json 파일을 넣어서 Signed URL 생성
+### Signed URL 만들기
+
+- 참조: https://cloud.google.com/storage/docs/access-control/signing-urls-with-helpers
+- IAM & Admin > Service Accounts > 계정 선택 > KEYS > ADD KEY > Create new key > JSON > CREATE
+- 다운로드된 json 파일을 넣어서 Signed URL 생성
 
 ```sh
 gsutil signurl -d 1m test@developer.gserviceaccount.com.json gs://test/sample.zip
+```
+
+
+
+### rsync
+
+> https://cloud.google.com/storage/docs/gsutil/commands/rsync
+
+GCS 모든 파일 다운로드 받고 mtime 갱신, 업로드, setmeta 후 삭제하는 스크립트
+
+`paths` 
+
+```sh
+gs://test/
+```
+
+`t.sh` 
+
+```sh
+#!/bin/bash
+
+for path in $(cat paths); do
+  gsutil -m rsync -r "${path}" .
+  find . -exec touch {} \;
+  gsutil -m rsync -x '.*\.sh$' -r . "${path}"
+  gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" "${path}**"
+  rm -rf $(ls | egrep -v '*.sh')
+done
 ```
 
 
