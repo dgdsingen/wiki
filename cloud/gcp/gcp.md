@@ -1424,6 +1424,8 @@ gcloud compute ssl-certificates delete cert-prd --region=asia-northeast3 --proje
 
 # Cloud Storage
 
+## Encryption
+
 Bucket의 Encryption 방식이 CMEK, CSEK인 경우, 해당 Bucket의 Object들은 Cache-Control metadata가 설정되지 않는다.
 
 Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Control metadata 설정이 가능하다.
@@ -1433,6 +1435,19 @@ Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Co
 설정을 변경한 후부터 업로드하는 Object들은 이제 Google Managed Key 방식으로 암호화되며 Cache-Control metadata가 설정 가능해진다.
 
 그러나 기존에 존재하는 Object들은 CMEK, CSEK 등 기존 암호화 방식으로 존재하니 이들을 Google Managed Key 방식으로 바꾸려면 일괄 다운로드 & 업로드를 해야 한다. [rsync](#rsync) 를 참조하자.
+
+
+
+## Permission
+
+> https://cloud.google.com/storage/docs/uniform-bucket-level-access
+>
+> https://cloud.google.com/storage/docs/access-control/lists
+
+GCS의 Permission 종류로는 Uniform과 ACL이 있다.
+
+- Uniform: Bucket 단위. Bucket 안의 모든 Object들은 동일한 Permission이 적용된다.
+- ACL: Object 단위. Bucket 내 모든 Object들은 각각의 Permission을 가지며, 기본적으로 파일을 업로드한 사람이 Owner가 된다.
 
 
 
