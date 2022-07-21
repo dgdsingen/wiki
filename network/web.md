@@ -1,3 +1,14 @@
+# HTTP/2
+
+```sh
+# check http2
+curl --http2 -vI https://www.google.com
+
+openssl s_client -alpn h2 -connect google.com:443 -status | grep ALPN
+```
+
+
+
 # Chrome 80+ SameSite 이슈 대응
 
 - Chrome 80+ 부터 SameSite 기본값이 None => Lax로 변경됨. 

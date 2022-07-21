@@ -798,9 +798,6 @@ curl $URL -o test.sh
 
 # follow redirects
 curl -L $URL
-
-# http2
-curl --http2 $URL
 ```
 
 
