@@ -790,11 +790,17 @@ diff -qr dir1 dir2
 # ignore ssl error
 curl -k $URL
 
+# only show headers
+curl -I $URL
+
 # download a file
 curl $URL -o test.sh
 
 # follow redirects
 curl -L $URL
+
+# http2
+curl --http2 $URL
 ```
 
 

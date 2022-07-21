@@ -60,6 +60,14 @@ OFF
 
 
 
+## Chrome socket connection limit
+
+HTTP/1.1에서는 6개 제한이 있다. HTTP/2는 제한이 없으니 가능하면 Client 단과 직접 통신하는 Proxy의 프로토콜을 HTTP/2 지원되게 하자. 
+
+물론 Negotiation 과정에서 Client가 HTTP/2를 지원하지 않을 경우 HTTP/1.1로 fallback은 가능해야 한다.
+
+
+
 # Chrome OS
 
 ## OpenVPN
