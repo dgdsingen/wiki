@@ -1471,6 +1471,13 @@ GCS의 Permission 종류로는 Uniform과 ACL이 있다.
 
 
 
+만약 ACL을 사용하고 여러 Bucket 중 하나만 권한을 주고 싶다고 하면
+
+- IAM에서는 `storage.buckets.list` 를 준다. 그래야 GCS 최초 접속시 Bucket 리스트가 보인다.
+- Bucket 하나 안에 들어가서 Permission에 `storage.buckets.view` , `storage.objects.*` 을 준다. 그럼 해당 Bucket의 Objects를 관리할 수 있게 된다.
+
+
+
 ## gzip 압축 트랜스코딩
 
 Cloud Storage에 gzip 압축된 파일을 올려서 서비스하고 싶다면 아래와 같이 진행한다.
