@@ -1447,7 +1447,7 @@ Google Managed Key를 사용한 Encryption 방식으로 변경해야만 Cache-Co
 GCS의 Permission 종류로는 Uniform과 ACL이 있다.
 
 - Uniform: Bucket 단위. Bucket 안의 모든 Object들은 동일한 Permission이 적용된다.
-- ACL: Object 단위. Bucket 내 모든 Object들은 각각의 Permission을 가지며, 기본적으로 파일을 업로드한 사람이 Owner가 된다.
+- ACL: Object 단위. Bucket 내 모든 Object들은 각각의 Permission을 가지며, 기본적으로 Object를 업로드한 사람이 Owner가 된다. 그러나 Bucket 단위 Admin 권한을 가졌다면 다른 Owner가 업로드한 Object를 overwrite할 수 있다.
 
 
 
