@@ -172,6 +172,12 @@ DOCKER_BUILDKIT=1 docker build .
 
 
 
+## Buildx
+
+`docker buildx` 로 BuildKit을 기본으로 사용하면서 Multi Architecture로 동시에 Build 할 수도 있다. 아직 Experimental 기능이라 사용하려면 명시적으로 기능을 풀어줘야 한다.
+
+
+
 # Backup
 
 
