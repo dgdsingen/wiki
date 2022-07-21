@@ -1,3 +1,21 @@
+# Image
+
+## EXIF
+
+> https://exiftool.org/install.html
+>
+> https://exiftool.org/examples.html
+
+```sh
+# describe exif. need imagemagick
+exiftool -a test.jpeg
+
+# update exif
+exiftool -UserComment="$RANDOM" test.jpeg
+```
+
+
+
 # Video
 
 ## Convert to mp4 by avconv

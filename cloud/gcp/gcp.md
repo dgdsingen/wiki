@@ -1440,7 +1440,7 @@ Purge Flag 처리 후 해당 Object에 대해 새 요청이 오면 Contents Vali
 
 이미지의 EXIF 정보를 변경하는 등의 파일 내용 변경이 있어야만 ETag가 변경되는 것으로 확인된다. 
 
-즉 이 경우엔 사진 찍은 날짜와 같은 크게 필요하지 않은 Metadata를 바꿔서 GCS에 업로드한 뒤 ETag 값이 바뀌는 것 보고 CDN Cache Purge를 하면 CDN에서도 Object가 갱신된다.
+즉 이 경우엔 "사진 찍은 날짜"와 같이 크게 중요하지 않은 Metadata를 바꿔서 GCS에 업로드한 뒤 ETag 값이 바뀌는 것 보고 CDN Cache Purge를 하면 CDN에서도 Object가 갱신된다.
 
 
 
