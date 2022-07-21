@@ -1424,6 +1424,26 @@ gcloud compute ssl-certificates delete cert-prd --region=asia-northeast3 --proje
 
 # Cloud Storage
 
+## ETag
+
+> https://cloud.google.com/storage/docs/hashes-etags#etags
+>
+> https://developer.mozilla.org/ko/docs/Web/HTTP/Conditional_requests
+
+CDN에서 Purge를 했을 때 Edge 서버에서 Cache를 지우고 그 뒤에 접속시 Cache Miss가 나서 Origin으로부터 새로 Object를 받아오는게 아니라
+
+Purge Flag 처리 후 해당 Object에 대해 새 요청이 오면 Contents Validation ([HTTP Conditional Requests](https://developer.mozilla.org/ko/docs/Web/HTTP/Conditional_requests))로 "기존 파일을 그대로 사용하거나 Origin으로부터 새로 가져오는" 경우가 있다.
+
+이 때 Origin으로부터 새로 가져오는 기준은 ETag 값 변경이 되어야 하는데, 그럼 GCS가 Origin인 경우 GCS의 ETag 변경 기준을 알아야 한다.
+
+테스트해보니 같은 내용의 파일이면 파일명을 바꿔도 ETag 값은 동일하다. 또한 GCS에서 Set Metadata하는 것으로는 ETag가 바뀌지 않는다.
+
+이미지의 EXIF 정보를 변경하는 등의 파일 내용 변경이 있어야만 ETag가 변경되는 것으로 확인된다. 
+
+즉 이 경우엔 사진 찍은 날짜와 같은 크게 필요하지 않은 Metadata를 바꿔서 GCS에 업로드한 뒤 ETag 값이 바뀌는 것 보고 CDN Cache Purge를 하면 CDN에서도 Object가 갱신된다.
+
+
+
 ## Encryption
 
 Bucket의 Encryption 방식이 CMEK, CSEK인 경우, 해당 Bucket의 Object들은 Cache-Control metadata가 설정되지 않는다.
