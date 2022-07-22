@@ -12,6 +12,12 @@ exiftool -a test.jpeg
 
 # update exif
 exiftool -UserComment="$RANDOM" test.jpeg
+
+# 모든 파일 EXIF 정보에 UserComment 값 추가
+for file in $(find . -type f | egrep -i '.*\.(png|jpeg)$'); do exiftool -UserComment="$RANDOM" $file; done
+
+# 백업 파일 삭제
+find . -type f -name '*_original' -exec rm {} \;
 ```
 
 
