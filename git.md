@@ -477,6 +477,8 @@ git remote set-url --push fork fork_url # set push remote
 ```sh
 git remote add $URL
 git config push.default current
+git config branch.master.remote origin
+git config branch.master.merge refs/heads/master
 ```
 
 
