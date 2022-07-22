@@ -172,18 +172,6 @@ relative/path/*.txt text eol-lf
 
 
 
-## Remote fetch/push 저장소 변경
-
-원본 Repo를 fork 떠서, fetch는 원본 Repo(upstream)으로부터 받고 push는 fork(downstream) repo로 하는 등 fetch와 push remote를 변경하고 싶다면 아래와 같이 설정한다.
-
-```sh
-git clone repo
-git remote set-url fork fork_url # set fetch remote
-git remote set-url --push fork fork_url # set push remote
-```
-
-
-
 # Hook
 
 ## .git/hooks/pre-commit
@@ -468,6 +456,27 @@ git branch -m master main
 git fetch origin
 git branch -u origin/main main
 git remote set-head origin -a
+```
+
+
+
+## Remote fetch/push 저장소 변경
+
+원본 Repo를 fork 떠서, fetch는 원본 Repo(upstream)으로부터 받고 push는 fork(downstream) repo로 하는 등 fetch와 push remote를 변경하고 싶다면 아래와 같이 설정한다.
+
+```sh
+git clone repo
+git remote set-url fork fork_url # set fetch remote
+git remote set-url --push fork fork_url # set push remote
+```
+
+
+
+## Remote 추가
+
+```sh
+git remote add $URL
+git config push.default current
 ```
 
 
